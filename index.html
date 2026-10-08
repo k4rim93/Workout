@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#111111">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Kikz Training">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <title>Kikz Training</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="app">
+    <header class="topbar">
+      <button class="icon-btn" id="homeBtn" aria-label="Home">⌂</button>
+      <div class="brand">KIKZ <span>TRAINING</span></div>
+      <button class="icon-btn" id="resetBtn" aria-label="Reset progress">↺</button>
+    </header>
+    <main id="screen"></main>
+    <nav class="bottom-nav" aria-label="Days">
+      <button data-day="1">DAY 1</button><button data-day="2">DAY 2</button><button data-day="3">DAY 3</button><button data-day="4">DAY 4</button>
+    </nav>
+  </div>
+  <script src="data.js"></script><script src="app.js"></script>
+</body>
+</html>
