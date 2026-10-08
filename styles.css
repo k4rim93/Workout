@@ -93,7 +93,7 @@ body.home-mode{overflow:hidden}
 .home-full-hero{inset:0!important;width:100vw!important;height:100svh!important}
 .home-full-actions{bottom:calc(24px + var(--safe-bottom))!important}
 
-.home-full-actions .choice-icon svg{width:25px;height:25px;display:block}.home-full-actions .workout-choice .choice-icon svg{width:27px;height:27px}.home-full-actions .cardio-choice .choice-icon svg{width:27px;height:27px}
+
 /* KIKZ FILLED HOME BUTTONS */
 .home-full-actions .home-choice{border:0;color:#fff;box-shadow:0 10px 24px rgba(0,0,0,.18);backdrop-filter:none}
 .home-full-actions .workout-choice{background:#e83b35}
@@ -102,4 +102,9 @@ body.home-mode{overflow:hidden}
 .home-full-actions .choice-arrow{background:rgba(255,255,255,.16);color:#fff}
 .home-full-actions .choice-copy strong{color:#fff}
 
-.material-symbol{font-family:'Material Symbols Rounded';font-weight:500;font-style:normal;font-size:28px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-feature-settings:'liga';font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 28}.home-full-actions .choice-icon.material-symbol{background:rgba(255,255,255,.16);color:#fff}
+
+/* READY-MADE PHOSPHOR ICONS — match reference */
+.home-full-actions .choice-icon{background:transparent!important;color:#fff;width:42px;height:42px;border-radius:0;font-size:32px;display:grid;place-items:center;line-height:1}
+.home-full-actions .choice-icon.ph-fill{font-size:32px}
+.home-full-actions .workout-choice .choice-icon.ph-fill{font-size:34px}
+.home-full-actions .cardio-choice .choice-icon.ph-fill{font-size:34px}
