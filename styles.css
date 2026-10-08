@@ -181,3 +181,16 @@ body.home-mode{overflow:hidden}
 .program-list-copy small{font-size:8px;font-weight:800;color:#888;letter-spacing:.04em}
 .program-list-arrow{margin-left:auto;width:27px;height:27px;border-radius:50%;background:#f1f1f1;display:grid;place-items:center;font-size:20px;line-height:1;flex:none}
 .library-note,.program-history-note{margin:12px 2px 4px;font-size:9px;line-height:1.45;color:#999}
+
+/* PROGRAM PROGRESS + NEXT SESSION */
+.program-progress{margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.1)}
+.program-progress-head{display:flex;justify-content:space-between;align-items:center;font-size:8px;font-weight:900;letter-spacing:.1em;opacity:.7}
+.program-progress-head strong{font-size:11px;opacity:1}
+.program-progress-bar{height:5px;background:rgba(255,255,255,.12);border-radius:99px;overflow:hidden;margin-top:6px}
+.program-progress-bar span{display:block;height:100%;background:var(--program-accent,#fff);border-radius:99px;transition:width .25s ease}
+.next-session{margin-top:12px;padding:12px;border-radius:14px;background:rgba(255,255,255,.08);display:flex;align-items:center;justify-content:space-between;gap:10px}
+.next-session>div{min-width:0;display:flex;flex-direction:column;gap:3px}
+.next-session small{font-size:8px;font-weight:900;letter-spacing:.1em;opacity:.5}
+.next-session strong{font-size:11px;line-height:1.2}
+.next-session span{font-size:8px;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.next-session button{border:0;border-radius:10px;background:#fff;color:#111;padding:9px 10px;font-size:9px;font-weight:950;white-space:nowrap}
