@@ -1,4 +1,4 @@
-const CACHE='kikz-training-v34';
+const CACHE='kikz-training-v35';
 const ASSETS=[
   './',
   './index.html',
@@ -12,7 +12,8 @@ const ASSETS=[
   './day4.png',
   './kikz-home-clean.jpg',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './icons/kikz-classic-dark.svg'
 ];
 
 self.addEventListener('install',event=>{
