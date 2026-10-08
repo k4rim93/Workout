@@ -155,3 +155,7 @@ body.home-mode{overflow:hidden}
 .item .check,.item .play,.primary,.day-complete,.next-day,.cardio-done,.mode-btn,.section-nav button{transition:transform .12s ease,opacity .12s ease}
 .item .check:active,.item .play:active,.primary:active,.day-complete:active,.next-day:active,.cardio-done:active,.mode-btn:active,.section-nav button:active{transform:scale(.97)}
 @media(max-width:420px){.next-up-card{padding:14px}.next-up-card strong{font-size:12px}.next-up-card button{padding:9px 10px}}
+
+/* HOME HEADER — never show duplicate KIKZ wordmark */
+.home-mode .topbar .brand,
+.home-mode .topbar .brand span{display:none!important}
