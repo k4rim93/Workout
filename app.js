@@ -2,6 +2,9 @@ const screen=document.getElementById('screen'),days=window.KIKZ_DAYS,cardio=wind
 let state=JSON.parse(localStorage.getItem(stateKey)||'{"day":1,"done":{},"mode":"no-padel"}');
 let currentView='home';
 function save(){localStorage.setItem(stateKey,JSON.stringify(state))}
+function haptic(pattern=8){try{if(navigator.vibrate)navigator.vibrate(pattern)}catch(e){}}
+function pressFeedback(el){if(!el)return;el.classList.remove('tap-pop');void el.offsetWidth;el.classList.add('tap-pop');setTimeout(()=>el.classList.remove('tap-pop'),180)}
+function bindInteractionFeedback(){screen.querySelectorAll('button,a').forEach(el=>el.addEventListener('pointerdown',()=>{pressFeedback(el);haptic(8)},{passive:true}))}
 function dayById(id){return days.find(d=>d.id===Number(id))}
 function dayKeys(d){
   return [
@@ -18,7 +21,12 @@ function dayCompleted(d){return!!(state.completedDays&&state.completedDays[d.id]
 
 function color(d){return d.color}
 function isDone(key){return!!state.done[key]}
-function toggle(key){state.done[key]=!state.done[key];save();renderDay(state.day)}
+function toggle(key){
+  state.done[key]=!state.done[key];
+  const d=dayById(state.day);
+  if(d&&dayProgress(d).complete){state.completedDays=state.completedDays||{};state.completedDays[d.id]=true;haptic([10,35,10])}else haptic(8);
+  save();renderDay(state.day)
+}
 function sectionTitle(n,label,d,id){return `<div class="section-title" id="${id||''}"><i style="background:${color(d)}">${n}</i>${label}</div>`}
 function home(view='workout'){
   currentView='home';
@@ -64,11 +72,18 @@ function renderWorkoutHome(){
         </button>`;
       }).join('')}
     </div>
+    <div id="nextUpMount"></div>
     <button class="reset-link" id="resetHome">Reset progress</button>
     <div class="rule-card"><strong>Training rule:</strong> Padel counts as conditioning. If you played hard, skip Intervals. On busy days, do the Strength workout only.</div>
   </section>`;
   document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{state.day=Number(b.dataset.open);save();renderDay(state.day)});
   document.getElementById('resetHome').onclick=resetProgress;
+  const mount=document.getElementById('nextUpMount');
+  const completed=(state.completedDays&&Object.keys(state.completedDays).filter(k=>state.completedDays[k]).map(Number))||[];
+  const next=days.find(d=>!completed.includes(d.id));
+  mount.innerHTML=next?'<div class="next-up-card"><div><span>NEXT UP</span><strong>DAY '+next.id+' — '+next.name+'</strong><small>'+next.focus+'</small></div><button data-open="'+next.id+'">START →</button></div>':'<div class="all-days-complete">✓ ALL 4 DAYS COMPLETE</div>';
+  mount.querySelector('[data-open]')?.addEventListener('click',()=>{state.day=Number(mount.querySelector('[data-open]').dataset.open);save();haptic(12);renderDay(state.day)});
+  bindInteractionFeedback();
 }
 function warmupItem(item,d,i){const[name,meta]=item,key=`${d.id}-w-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta"><span>${meta}</span></div></div></div>`}
 function workoutItem(item,d,i){const[name,sets,rir,rest,url]=item,key=`${d.id}-x-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta">${sets?`<span>${sets}</span>`:''}${rir?`<span>${rir}</span>`:''}${rest?`<span>Rest ${rest}</span>`:''}</div></div><a class="play" style="background:${color(d)}" href="${url}" target="_blank" rel="noopener" aria-label="Open video">▶</a></div>`}
@@ -105,10 +120,11 @@ function renderDay(id){
   document.getElementById('start').onclick=()=>document.getElementById('workout')?.scrollIntoView({behavior:'smooth',block:'start'});
   document.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump)?.scrollIntoView({behavior:'smooth',block:'start'}));
   document.getElementById('completeDay').onclick=()=>{
-    state.completedDays=state.completedDays||{};state.completedDays[d.id]=true;save();renderDay(d.id);
+    state.completedDays=state.completedDays||{};state.completedDays[d.id]=true;save();haptic([10,35,10]);renderDay(d.id);
   };
-  document.getElementById('nextDay')?.addEventListener('click',()=>{state.day=Math.min(days.length,d.id+1);save();renderDay(state.day)});
+  document.getElementById('nextDay')?.addEventListener('click',()=>{state.day=Math.min(days.length,d.id+1);save();haptic(12);renderDay(state.day)});
   bindToggles();
+  bindInteractionFeedback();
 }
 function renderCardio(){
   currentView='cardio';
@@ -128,7 +144,8 @@ function renderCardio(){
       <div class="cardio-actions"><button class="cardio-done ${isDone('c-'+c.id)?'done-btn':''}" data-cardio="${c.id}">${isDone('c-'+c.id)?'✓ DONE':'MARK DONE'}</button><a class="play" style="background:${c.color}" href="${c.url}" target="_blank" rel="noopener" aria-label="Open video">▶</a></div>
     </article>`).join('')}</div>`;
   document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderCardio()});
-  document.querySelectorAll('[data-cardio]').forEach(b=>b.onclick=()=>{const k='c-'+b.dataset.cardio;state.done[k]=!state.done[k];save();renderCardio()});
+  document.querySelectorAll('[data-cardio]').forEach(b=>b.onclick=()=>{const k='c-'+b.dataset.cardio;state.done[k]=!state.done[k];save();haptic(12);renderCardio()});
+  bindInteractionFeedback();
 }
 function setupEdgeSwipe(){
   let startX=0,startY=0,tracking=false;
@@ -152,7 +169,7 @@ function setupEdgeSwipe(){
       screen.style.transition='transform 180ms ease';screen.style.transform='translateX(28px)';
       setTimeout(()=>{
         screen.style.transition='';screen.style.transform='translateX(0)';
-        if(currentView==='day') renderWorkoutHome();
+        haptic(10); if(currentView==='day') renderWorkoutHome();
         else if(currentView==='workout'||currentView==='cardio') home();
       },140);
     }else resetSwipe();
