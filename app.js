@@ -102,6 +102,14 @@ async function updateAndReload(){
 document.getElementById('reloadBtn').onclick=updateAndReload;
 document.getElementById('workoutNav').onclick=()=>home('workout');
 document.getElementById('cardioNav').onclick=()=>renderCardio();
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.bottom-nav button');
+  if(!b)return;
+  e.preventDefault();
+  e.stopPropagation();
+  if(b.id==='workoutNav'){home('workout');}
+  if(b.id==='cardioNav'){renderCardio();}
+},true);
 function resetProgress(){
   if(confirm('Reset all workout and cardio checkmarks?')){
     state={day:state.day,done:{},mode:state.mode};save();renderDay(state.day);
