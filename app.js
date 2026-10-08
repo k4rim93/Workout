@@ -180,33 +180,37 @@ function renderCardioProgram(programId){
   document.querySelectorAll('[data-mode]').forEach(x=>x.onclick=()=>{state.mode=x.dataset.mode;save();renderCardioProgram(p.id)});
   document.querySelectorAll('[data-cardio]').forEach(x=>x.onclick=()=>{const k=scopedKey(p.id,'c-'+x.dataset.cardio);state.done[k]=!state.done[k];save();haptic(12);renderCardioProgram(p.id)}); bindInteractionFeedback();
 }function setupEdgeSwipe(){
-  let startX=0,startY=0,tracking=false;
-  const resetSwipe=()=>{screen.style.transition='transform 180ms ease';screen.style.transform='translateX(0)';setTimeout(()=>{screen.style.transition='';},190)};
+  let startX=0,startY=0,tracking=false,claimed=false;
+  const reset=()=>{screen.style.transition='transform 180ms ease';screen.style.transform='translateX(0)';setTimeout(()=>{screen.style.transition='';},190);};
   screen.addEventListener('touchstart',e=>{
     if(!e.touches.length)return;
     const t=e.touches[0];
-    tracking=t.clientX<=36;
+    tracking=t.clientX<=52;claimed=false;
     if(tracking){startX=t.clientX;startY=t.clientY;screen.style.transition='';}
   },{passive:true});
   screen.addEventListener('touchmove',e=>{
     if(!tracking||!e.touches.length)return;
-    const t=e.touches[0],dx=t.clientX-startX,dy=Math.abs(t.clientY-startY);
-    if(dx>0&&dy<Math.max(45,dx*.7))screen.style.transform=`translateX(${Math.min(dx*.18,14)}px)`;
-  },{passive:true});
+    const t=e.touches[0],dx=t.clientX-startX,dy=t.clientY-startY;
+    if(dx>10&&Math.abs(dy)<Math.max(35,dx*.65)){
+      claimed=true;
+      if(e.cancelable)e.preventDefault();
+      screen.style.transform=`translateX(${Math.min(dx*.22,42)}px)`;
+    }else if(Math.abs(dy)>Math.abs(dx)*1.2){tracking=false;reset();}
+  },{passive:false});
   screen.addEventListener('touchend',e=>{
     if(!tracking||!e.changedTouches.length)return;
     const t=e.changedTouches[0],dx=t.clientX-startX,dy=Math.abs(t.clientY-startY);
     tracking=false;
-    if(dx>70&&dy<70){
-      screen.style.transition='transform 180ms ease';screen.style.transform='translateX(28px)';
-      setTimeout(()=>{
-        screen.style.transition='';screen.style.transform='translateX(0)';
-        haptic(10); if(currentView==='day'||currentView==='program') renderWorkoutHome();
-        else if(currentView==='cardio-program') renderCardio();
-        else if(currentView==='workout'||currentView==='cardio') home();
-      },140);
-    }else resetSwipe();
+    if(claimed&&dx>65&&dy<85){
+      screen.style.transition='transform 140ms ease';screen.style.transform='translateX(36px)';
+      setTimeout(()=>{screen.style.transition='';screen.style.transform='translateX(0)';haptic(10);
+        if(currentView==='day'||currentView==='program')renderWorkoutHome();
+        else if(currentView==='cardio-program')renderCardio();
+        else if(currentView==='workout'||currentView==='cardio')home();
+      },120);
+    }else reset();
   },{passive:true});
+  screen.addEventListener('touchcancel',()=>{tracking=false;reset();},{passive:true});
 }
 
 function setNav(active){
