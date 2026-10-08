@@ -107,3 +107,13 @@ body.home-mode{overflow:hidden}
 /* HOME BUTTONS — icons intentionally removed */
 .home-full-actions .choice-icon{display:none!important}
 .home-full-actions .home-choice{grid-template-columns:1fr 28px}
+
+/* HOME BUTTON LABELS — visually centered */
+.home-full-actions .home-choice{position:relative;display:flex;align-items:center;justify-content:center;padding-left:18px;padding-right:56px}
+.home-full-actions .choice-copy{width:100%;align-items:center;justify-content:center;text-align:center}
+.home-full-actions .choice-copy strong{display:block;text-align:center}
+.home-full-actions .choice-arrow{position:absolute;right:14px;top:50%;transform:translateY(-50%);margin:0}
+@media(max-width:420px){
+  .home-full-actions .home-choice{padding-left:14px;padding-right:50px}
+  .home-full-actions .choice-arrow{right:11px}
+}
