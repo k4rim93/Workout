@@ -1,32 +1,27 @@
-const screen=document.getElementById('screen'),days=window.KIKZ_DAYS,cardio=window.KIKZ_CARDIO,stateKey='kikz-training-v2';
+const screen=document.getElementById('screen'),programs=window.KIKZ_PROGRAMS,cardioPrograms=window.KIKZ_CARDIO_PROGRAMS,stateKey='kikz-training-v2';
 let state=JSON.parse(localStorage.getItem(stateKey)||'{"day":1,"done":{},"mode":"no-padel"}');
 let currentView='home';
+state.activeWorkoutProgram=state.activeWorkoutProgram||'program-01';
+state.activeCardioProgram=state.activeCardioProgram||'cardio-01';
+state.done=state.done||{}; state.completedDays=state.completedDays||{};
 function save(){localStorage.setItem(stateKey,JSON.stringify(state))}
+function activeProgram(){return programs.find(p=>p.id===state.activeWorkoutProgram)||programs[0]}
+function activeCardioProgram(){return cardioPrograms.find(p=>p.id===state.activeCardioProgram)||cardioPrograms[0]}
+function programDays(){return activeProgram().days}
+function cardio(){return activeCardioProgram().cardio}
+function scopedKey(scope,key){return scope+'::'+key}
+function migrateProgramState(){if(state.programStateVersion===2)return;Object.keys(state.done).forEach(k=>{if(/^\\d+-[wxm]-\\d+$/.test(k))state.done[scopedKey('program-01',k)]=state.done[k];if(/^c-[A-Z]$/.test(k))state.done[scopedKey('cardio-01',k)]=state.done[k]});Object.keys(state.completedDays).forEach(k=>{if(/^\\d+$/.test(k))state.completedDays[scopedKey('program-01',k)]=state.completedDays[k]});state.programStateVersion=2;save()}
+migrateProgramState()
 function haptic(pattern=8){try{if(navigator.vibrate)navigator.vibrate(pattern)}catch(e){}}
 function pressFeedback(el){if(!el)return;el.classList.remove('tap-pop');void el.offsetWidth;el.classList.add('tap-pop');setTimeout(()=>el.classList.remove('tap-pop'),180)}
 function bindInteractionFeedback(){screen.querySelectorAll('button,a').forEach(el=>el.addEventListener('pointerdown',()=>{pressFeedback(el);haptic(8)},{passive:true}))}
-function dayById(id){return days.find(d=>d.id===Number(id))}
-function dayKeys(d){
-  return [
-    ...d.warmup.map((_,i)=>`${d.id}-w-${i}`),
-    ...d.workout.map((_,i)=>`${d.id}-x-${i}`),
-    ...d.mobility.map((_,i)=>`${d.id}-m-${i}`)
-  ];
-}
-function dayProgress(d){
-  const keys=dayKeys(d),done=keys.filter(k=>isDone(k)).length;
-  return {done,total:keys.length,complete:done===keys.length};
-}
-function dayCompleted(d){return!!(state.completedDays&&state.completedDays[d.id])}
-
+function dayById(id){return programDays().find(d=>d.id===Number(id))}
+function dayKeys(d){return [...d.warmup.map((_,i)=>scopedKey(activeProgram().id,`${d.id}-w-${i}`)),...d.workout.map((_,i)=>scopedKey(activeProgram().id,`${d.id}-x-${i}`)),...d.mobility.map((_,i)=>scopedKey(activeProgram().id,`${d.id}-m-${i}`))]}
+function dayProgress(d){const keys=dayKeys(d),done=keys.filter(k=>isDone(k)).length;return {done,total:keys.length,complete:done===keys.length}}
+function dayCompleted(d){return!!state.completedDays[scopedKey(activeProgram().id,d.id)]}
 function color(d){return d.color}
 function isDone(key){return!!state.done[key]}
-function toggle(key){
-  state.done[key]=!state.done[key];
-  const d=dayById(state.day);
-  if(d&&dayProgress(d).complete){state.completedDays=state.completedDays||{};state.completedDays[d.id]=true;haptic([10,35,10])}else haptic(8);
-  save();renderDay(state.day)
-}
+function toggle(key){state.done[key]=!state.done[key];const d=dayById(state.day);if(d&&dayProgress(d).complete){state.completedDays[scopedKey(activeProgram().id,d.id)]=true;haptic([10,35,10])}else haptic(8);save();renderDay(state.day)}
 function sectionTitle(n,label,d,id){return `<div class="section-title" id="${id||''}"><i style="background:${color(d)}">${n}</i>${label}</div>`}
 function home(view='workout'){
   currentView='home';
@@ -114,7 +109,7 @@ function renderDay(id){
   ${sectionTitle(2,'WORKOUT',d,'workout')}<div class="list">${d.workout.map((x,i)=>workoutItem(x,d,i)).join('')}</div>
   <div class="progression"><strong>Progression:</strong> Hit the top of the rep range on all sets with good form → increase load next session.</div>
   ${sectionTitle(3,'MOBILITY',d,'mobility')}<div class="list">${d.mobility.map((x,i)=>mobilityItem(x,d,i)).join('')}
-  <div class="day-complete-wrap"><button class="day-complete ${completed?'completed':''}" id="completeDay">${completed?'✓ DAY COMPLETE': 'MARK DAY COMPLETE'}</button>${d.id<days.length?'<button class="next-day" id="nextDay">NEXT DAY →</button>':''}</div>
+  <div class="day-complete-wrap"><button class="day-complete ${completed?'completed':''}" id="completeDay">${completed?'✓ DAY COMPLETE': 'MARK DAY COMPLETE'}</button>${d.id<programDays().length?'<button class="next-day" id="nextDay">NEXT DAY →</button>':''}</div>
   </div>`;
   document.getElementById('back').onclick=renderWorkoutHome;
   document.getElementById('start').onclick=()=>document.getElementById('workout')?.scrollIntoView({behavior:'smooth',block:'start'});
@@ -122,7 +117,7 @@ function renderDay(id){
   document.getElementById('completeDay').onclick=()=>{
     state.completedDays=state.completedDays||{};state.completedDays[d.id]=true;save();haptic([10,35,10]);renderDay(d.id);
   };
-  document.getElementById('nextDay')?.addEventListener('click',()=>{state.day=Math.min(days.length,d.id+1);save();haptic(12);renderDay(state.day)});
+  document.getElementById('nextDay')?.addEventListener('click',()=>{state.day=Math.min(programDays().length,d.id+1);save();haptic(12);renderDay(state.day)});
   bindToggles();
   bindInteractionFeedback();
 }
