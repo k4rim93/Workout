@@ -73,7 +73,11 @@ function renderCardio(){
   document.querySelectorAll('[data-cardio]').forEach(b=>b.onclick=()=>{const k='c-'+b.dataset.cardio;state.done[k]=!state.done[k];save();renderCardio()});
   setNav('cardio');
 }
-function setNav(active){document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.day===String(active)|| (active==='cardio'&&b.id==='cardioNav')))}
+function setNav(active){
+  document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.toggle('active',
+    (active==='cardio'&&b.id==='cardioNav') || (active!=='cardio'&&b.id==='workoutNav')
+  ));
+}
 document.getElementById('homeBtn').onclick=home;
 document.addEventListener('click',e=>{if(e.target.id==='resetHome')resetProgress();});
 async function updateAndReload(){
