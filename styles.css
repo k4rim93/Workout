@@ -94,3 +94,10 @@ body.home-mode{overflow:hidden}
 .home-full-actions{bottom:calc(24px + var(--safe-bottom))!important}
 
 .home-full-actions .choice-icon svg{width:25px;height:25px;display:block}.home-full-actions .workout-choice .choice-icon svg{width:27px;height:27px}.home-full-actions .cardio-choice .choice-icon svg{width:27px;height:27px}
+/* KIKZ FILLED HOME BUTTONS */
+.home-full-actions .home-choice{border:0;color:#fff;box-shadow:0 10px 24px rgba(0,0,0,.18);backdrop-filter:none}
+.home-full-actions .workout-choice{background:#e83b35}
+.home-full-actions .cardio-choice{background:#2474df}
+.home-full-actions .choice-icon{background:rgba(255,255,255,.16);color:#fff}
+.home-full-actions .choice-arrow{background:rgba(255,255,255,.16);color:#fff}
+.home-full-actions .choice-copy strong{color:#fff}
