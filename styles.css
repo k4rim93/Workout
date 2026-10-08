@@ -103,3 +103,7 @@ body.home-mode{overflow:hidden}
 .home-full-actions .choice-copy strong{color:#fff}
 
 
+
+/* HOME BUTTONS — icons intentionally removed */
+.home-full-actions .choice-icon{display:none!important}
+.home-full-actions .home-choice{grid-template-columns:1fr 28px}
