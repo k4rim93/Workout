@@ -1,4 +1,4 @@
-window.KIKZ_DAYS = [
+const KIKZ_PROGRAM_01_DAYS = [
   {
     "id":1,"name":"UPPER STRENGTH","color":"#C92A2A","image":"./day1.png","focus":"Chest • Back • Shoulders • Core",
     "warmup":[["Bike / Incline Walk","4 min moderate",""],["Band Pull-Apart","2 × 15",""],["Scapular Push-up","2 × 10",""],["T-Spine Rotation","2 × 8 / side",""]],
@@ -25,6 +25,19 @@ window.KIKZ_DAYS = [
   }
 ];
 
+window.KIKZ_PROGRAMS = [
+  {
+    id:"program-01",
+    name:"PADEL PERFORMANCE",
+    label:"MONTH 01",
+    status:"active",
+    description:"4 strength & athletic days built around Padel performance.",
+    days:KIKZ_PROGRAM_01_DAYS
+  }
+];
+
+window.KIKZ_DAYS = KIKZ_PROGRAM_01_DAYS;
+
 window.KIKZ_CARDIO = [
   {
     "id":"A","name":"ZONE 2 • SHORT","color":"#2F8F57","duration":"25–35 min","intensity":"RPE 5–6 • conversational pace",
@@ -49,5 +62,16 @@ window.KIKZ_CARDIO = [
     "when":"Use on busy weeks, after hard training, or when you want movement without adding much fatigue.",
     "details":["Bike / Easy Walk","20–30 min","Nasal breathing / relaxed conversational pace"],
     "url":"https://www.youtube.com/results?search_query=recovery+cycling+easy+cardio+technique"
+  }
+];
+
+window.KIKZ_CARDIO_PROGRAMS = [
+  {
+    id:"cardio-01",
+    name:"PADEL CONDITIONING",
+    label:"MONTH 01",
+    status:"active",
+    description:"Conditioning options matched to your Padel load and fatigue.",
+    cardio:window.KIKZ_CARDIO
   }
 ];
