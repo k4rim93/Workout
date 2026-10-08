@@ -194,3 +194,19 @@ body.home-mode{overflow:hidden}
 .next-session strong{font-size:11px;line-height:1.2}
 .next-session span{font-size:8px;opacity:.55;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .next-session button{border:0;border-radius:10px;background:#fff;color:#111;padding:9px 10px;font-size:9px;font-weight:950;white-space:nowrap}
+
+/* HOME INTERACTIVE MOTION — v1 */
+.home-animated{perspective:900px}
+.home-parallax-img{transform:scale(1.035) translate3d(0,0,0);transition:transform .55s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.home-parallax-overlay{transition:transform .55s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.home-parallax-actions{transition:transform .55s cubic-bezier(.2,.7,.2,1);will-change:transform}
+.home-reveal{opacity:0;transform:translateY(18px);animation:kikzHomeButtonIn .55s cubic-bezier(.2,.75,.2,1) forwards}
+.home-reveal:nth-child(1){animation-delay:.18s}
+.home-reveal:nth-child(2){animation-delay:.28s}
+.home-animated.home-exit .home-parallax-img{transform:scale(1.065);opacity:.88;transition:transform .18s ease,opacity .18s ease}
+.home-animated.home-exit .home-parallax-actions{transform:translateY(8px);opacity:0;transition:transform .18s ease,opacity .18s ease}
+@keyframes kikzHomeButtonIn{to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){
+ .home-parallax-img,.home-parallax-overlay,.home-parallax-actions{transition:none!important}
+ .home-reveal{opacity:1;transform:none;animation:none}
+}
