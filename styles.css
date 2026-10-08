@@ -33,3 +33,30 @@
 .poster-wrap{position:relative}
 .poster-link{position:absolute;display:block;z-index:8;border-radius:12px;background:transparent;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .poster-link:active{background:rgba(0,0,0,.06)}
+
+/* KIKZ HOME */
+#app{padding-bottom:24px}
+.home-screen{padding-top:8px}
+.home-kicker{font-size:12px;font-weight:850;letter-spacing:.16em;color:#666;margin:10px 2px 2px}
+.home-brand{font-size:44px;line-height:1;font-weight:950;letter-spacing:-.06em;margin:8px 0 14px}
+.home-hero{border-radius:24px;overflow:hidden;background:#eee;box-shadow:0 10px 30px rgba(0,0,0,.08);aspect-ratio:1/1.12}
+.home-hero-img{display:block;width:100%;height:100%;object-fit:cover}
+.home-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.home-choice{border:1px solid var(--line);border-radius:20px;background:#fff;min-width:0;padding:13px 10px;display:grid;grid-template-columns:40px 1fr 26px;align-items:center;gap:9px;text-align:left;box-shadow:0 5px 18px rgba(0,0,0,.045);touch-action:manipulation}
+.home-choice:active{transform:scale(.985)}
+.choice-icon{width:40px;height:40px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px}
+.workout-choice .choice-icon{background:#e83b35}
+.cardio-choice .choice-icon{background:#2474df}
+.choice-copy{min-width:0;display:flex;flex-direction:column;gap:3px}
+.choice-copy strong{font-size:14px;line-height:1;font-weight:950;letter-spacing:.01em;white-space:nowrap}
+.choice-copy small{font-size:8px;color:#777;font-weight:800;letter-spacing:.08em;white-space:nowrap}
+.choice-arrow{width:26px;height:26px;border-radius:50%;background:#f1f1f1;display:grid;place-items:center;font-size:20px;line-height:1}
+@media(max-width:420px){
+  .home-brand{font-size:40px}
+  .home-actions{gap:8px}
+  .home-choice{padding:12px 8px;grid-template-columns:36px 1fr 24px;gap:7px}
+  .choice-icon{width:36px;height:36px;border-radius:12px}
+  .choice-copy strong{font-size:12px}
+  .choice-copy small{font-size:7px}
+  .choice-arrow{width:24px;height:24px;font-size:18px}
+}
