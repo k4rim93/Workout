@@ -30,23 +30,48 @@ function home(view='workout'){
   currentView='home';
   document.body.classList.add('home-mode');
   screen.innerHTML=`<section class="home-screen home-full">
-    <div class="home-hero home-full-hero">
-      <img src="./kikz-home-clean.jpg" alt="KIKZ training" class="home-hero-img">
-      <div class="home-overlay"></div>
-      <div class="home-actions home-full-actions">
-        <button class="home-choice workout-choice" id="homeWorkout" aria-label="Open Workout">
+    <div class="home-hero home-full-hero home-animated">
+      <img src="./kikz-home-clean.jpg" alt="KIKZ training" class="home-hero-img home-parallax-img">
+      <div class="home-overlay home-parallax-overlay"></div>
+      <div class="home-actions home-full-actions home-parallax-actions">
+        <button class="home-choice workout-choice home-reveal" id="homeWorkout" aria-label="Open Workout">
           <span class="choice-copy"><strong>WORKOUT</strong></span>
           <span class="choice-arrow">›</span>
         </button>
-        <button class="home-choice cardio-choice" id="homeCardio" aria-label="Open Cardio">
+        <button class="home-choice cardio-choice home-reveal" id="homeCardio" aria-label="Open Cardio">
           <span class="choice-copy"><strong>CARDIO</strong></span>
           <span class="choice-arrow">›</span>
         </button>
       </div>
     </div>
   </section>`;
-  document.getElementById('homeWorkout').onclick=()=>renderWorkoutHome();
-  document.getElementById('homeCardio').onclick=()=>renderCardio();
+  const hero=document.querySelector('.home-animated');
+  const img=document.querySelector('.home-parallax-img');
+  const overlay=document.querySelector('.home-parallax-overlay');
+  const actions=document.querySelector('.home-parallax-actions');
+  let raf=0,px=0,py=0;
+  const move=(x,y)=>{
+    if(!hero)return;
+    const r=hero.getBoundingClientRect();
+    px=Math.max(-1,Math.min(1,(x-r.left-r.width/2)/(r.width/2)));
+    py=Math.max(-1,Math.min(1,(y-r.top-r.height/2)/(r.height/2)));
+    if(raf)return;
+    raf=requestAnimationFrame(()=>{
+      if(img)img.style.transform=`scale(1.035) translate3d(${px*-7}px,${py*-5}px,0)`;
+      if(overlay)overlay.style.transform=`translate3d(${px*2}px,${py*1.5}px,0)`;
+      if(actions)actions.style.transform=`translate3d(${px*2}px,${py*1.5}px,0)`;
+      raf=0;
+    });
+  };
+  hero?.addEventListener('pointermove',e=>move(e.clientX,e.clientY),{passive:true});
+  hero?.addEventListener('pointerleave',()=>{if(img)img.style.transform='scale(1.035) translate3d(0,0,0)';if(overlay)overlay.style.transform='translate3d(0,0,0)';if(actions)actions.style.transform='translate3d(0,0,0)'},{passive:true});
+  const enter=(fn)=>{
+    const hero=document.querySelector('.home-animated');
+    hero?.classList.add('home-exit');
+    setTimeout(fn,180);
+  };
+  document.getElementById('homeWorkout').onclick=()=>enter(()=>renderWorkoutHome());
+  document.getElementById('homeCardio').onclick=()=>enter(()=>renderCardio());
 }
 function renderWorkoutHome(){
   currentView='workout'; document.body.classList.remove('home-mode');
