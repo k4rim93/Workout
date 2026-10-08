@@ -18,6 +18,8 @@ function bindInteractionFeedback(){screen.querySelectorAll('button,a').forEach(e
 function dayById(id){return programDays().find(d=>d.id===Number(id))}
 function dayKeys(d){return [...d.warmup.map((_,i)=>`${d.id}-w-${i}`),...d.workout.map((_,i)=>`${d.id}-x-${i}`),...d.mobility.map((_,i)=>`${d.id}-m-${i}`)]}
 function dayProgress(d){const keys=dayKeys(d),done=keys.filter(k=>isDone(k)).length;return {done,total:keys.length,complete:done===keys.length}}
+function programProgress(p){const all=p.days.flatMap(d=>dayKeys(d)),done=all.filter(k=>isDone(k)).length;return {done,total:all.length,pct:all.length?Math.round(done/all.length*100):0}}
+function nextSession(p){return p.days.find(d=>!dayCompleted(d))||p.days[0]}
 function dayCompleted(d){return!!state.completedDays[scopedKey(activeProgram().id,d.id)]}
 function color(d){return d.color}
 function isDone(key){return!!state.done[scopedKey(activeProgram().id,key)]}
@@ -56,6 +58,8 @@ function renderWorkoutHome(){
       <div class="program-card-title">${current.label} — ${current.name}</div>
       <div class="program-card-desc">${current.description}</div>
       <div class="program-card-meta"><span>${current.days.length} DAYS / WEEK</span><span>ACTIVE</span></div>
+      <div class="program-progress"><div class="program-progress-head"><span>PROGRAM PROGRESS</span><strong>${programProgress(current).pct}%</strong></div><div class="program-progress-bar"><span style="width:${programProgress(current).pct}%"></span></div></div>
+      <div class="next-session"><div><small>NEXT SESSION</small><strong>DAY ${nextSession(current).id} — ${nextSession(current).name}</strong><span>${nextSession(current).focus}</span></div><button id="nextSessionBtn">START →</button></div>
       <button class="program-open" id="openCurrentProgram">OPEN PROGRAM →</button>
     </div>
     <div class="library-heading">YOUR PROGRAMS</div>
@@ -68,6 +72,7 @@ function renderWorkoutHome(){
     <div class="library-note">New programs can be added here later without changing this layout.</div>
   </section>`;
   document.getElementById('openCurrentProgram').onclick=()=>renderProgram(current.id);
+  document.getElementById('nextSessionBtn').onclick=()=>{const n=nextSession(current);state.day=n.id;save();renderDay(n.id)};
   document.querySelectorAll('[data-program]').forEach(b=>b.onclick=()=>renderProgram(b.dataset.program));
   bindInteractionFeedback();
 }
@@ -131,7 +136,9 @@ function renderCardio(){
   screen.innerHTML=`<section><div class="kicker">CONDITIONING SYSTEM</div><h1 class="home-title cardio-title">CARDIO</h1>
     <div class="program-current-card cardio-program-card" style="--program-accent:${current.cardio[0]?.color||'#111'}">
       <div class="program-card-kicker">CURRENT PROGRAM</div><div class="program-card-title">${current.label} — ${current.name}</div><div class="program-card-desc">${current.description}</div>
-      <div class="program-card-meta"><span>${current.cardio.length} OPTIONS</span><span>ACTIVE</span></div><button class="program-open" id="openCurrentCardio">OPEN PROGRAM →</button>
+      <div class="program-card-meta"><span>${current.cardio.length} OPTIONS</span><span>ACTIVE</span></div>
+      <div class="program-progress"><div class="program-progress-head"><span>PROGRAM PROGRESS</span><strong>${Math.round(current.cardio.filter(x=>cardioDone('c-'+x.id,current.id)).length/current.cardio.length*100)}%</strong></div><div class="program-progress-bar"><span style="width:${Math.round(current.cardio.filter(x=>cardioDone('c-'+x.id,current.id)).length/current.cardio.length*100)}%"></span></div></div>
+      <button class="program-open" id="openCurrentCardio">OPEN PROGRAM →</button>
     </div><div class="library-heading">YOUR PROGRAMS</div><div class="program-list">${cardioPrograms.map(p=>`
       <button class="program-list-card ${p.id===state.activeCardioProgram?'active':''}" data-cardio-program="${p.id}"><div class="program-list-accent" style="background:${p.cardio[0]?.color||'#111'}"></div>
       <div class="program-list-copy"><div class="program-list-label">${p.label}</div><strong>${p.name}</strong><small>${p.cardio.length} OPTIONS • ${p.status.toUpperCase()}</small></div><span class="program-list-arrow">›</span></button>`).join('')}</div>
