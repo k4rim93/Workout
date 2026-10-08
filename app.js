@@ -7,23 +7,23 @@ function isDone(key){return!!state.done[key]}
 function toggle(key){state.done[key]=!state.done[key];save();renderDay(state.day)}
 function sectionTitle(n,label,d){return `<div class="section-title"><i style="background:${color(d)}">${n}</i>${label}</div>`}
 function home(view='workout'){
-  screen.innerHTML=`<section class="home-screen">
-    <div class="home-kicker">YOUR TRAINING</div>
-    <div class="home-brand">KIKZ</div>
-    <div class="home-hero">
+  screen.innerHTML=`<section class="home-screen home-full">
+    <div class="home-hero home-full-hero">
       <img src="./kikz-home-clean.jpg" alt="KIKZ training" class="home-hero-img">
-    </div>
-    <div class="home-actions">
-      <button class="home-choice workout-choice" id="homeWorkout">
-        <span class="choice-icon">▮▮</span>
-        <span class="choice-copy"><strong>WORKOUT</strong><small>4 TRAINING DAYS</small></span>
-        <span class="choice-arrow">›</span>
-      </button>
-      <button class="home-choice cardio-choice" id="homeCardio">
-        <span class="choice-icon">➜</span>
-        <span class="choice-copy"><strong>CARDIO</strong><small>4 CONDITIONING OPTIONS</small></span>
-        <span class="choice-arrow">›</span>
-      </button>
+      <div class="home-overlay"></div>
+      <div class="home-full-brand">KIKZ</div>
+      <div class="home-actions home-full-actions">
+        <button class="home-choice workout-choice" id="homeWorkout" aria-label="Open Workout">
+          <span class="choice-icon">▮▮</span>
+          <span class="choice-copy"><strong>WORKOUT</strong></span>
+          <span class="choice-arrow">›</span>
+        </button>
+        <button class="home-choice cardio-choice" id="homeCardio" aria-label="Open Cardio">
+          <span class="choice-icon">➜</span>
+          <span class="choice-copy"><strong>CARDIO</strong></span>
+          <span class="choice-arrow">›</span>
+        </button>
+      </div>
     </div>
   </section>`;
   document.getElementById('homeWorkout').onclick=()=>renderWorkoutHome();
