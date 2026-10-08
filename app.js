@@ -126,27 +126,27 @@ function renderDay(id){
   bindInteractionFeedback();
 }
 function renderCardio(){
-  currentView='cardio';
-  document.body.classList.remove('home-mode');
-  screen.innerHTML=`<section>
-    <div class="kicker">CONDITIONING SYSTEM</div><h1 class="home-title cardio-title">CARDIO</h1>
-    <p class="home-sub">4 options — pick the one that matches your Padel load and fatigue.</p>
-    <div class="padel-switch">
-      <div><strong>PADEL / HARD SESSION TODAY?</strong><div class="small-muted">If yes, skip Intervals and use Recovery or nothing.</div></div>
-      <div class="switch-row"><button class="mode-btn ${state.mode==='padel'?'active':''}" data-mode="padel">YES</button><button class="mode-btn ${state.mode==='no-padel'?'active':''}" data-mode="no-padel">NO</button></div>
-    </div>
-    <div class="cardio-list">${cardio.map(c=>`<article class="cardio-card ${state.mode==='padel'&&c.id==='C'?'dimmed':''}">
-      <div class="cardio-head"><div class="cardio-dot" style="background:${c.color}">${c.id}</div><div><div class="day-name">${c.name}</div><div class="cardio-duration">${c.duration}</div></div></div>
-      <div class="cardio-intensity">${c.intensity}</div>
-      <div class="cardio-details">${c.details.map(x=>`<div>• ${x}</div>`).join('')}</div>
-      <div class="cardio-when"><strong>WHEN:</strong> ${c.when}</div>
-      <div class="cardio-actions"><button class="cardio-done ${isDone('c-'+c.id)?'done-btn':''}" data-cardio="${c.id}">${isDone('c-'+c.id)?'✓ DONE':'MARK DONE'}</button><a class="play" style="background:${c.color}" href="${c.url}" target="_blank" rel="noopener" aria-label="Open video">▶</a></div>
-    </article>`).join('')}</div>`;
-  document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderCardio()});
-  document.querySelectorAll('[data-cardio]').forEach(b=>b.onclick=()=>{const k='c-'+b.dataset.cardio;state.done[k]=!state.done[k];save();haptic(12);renderCardio()});
-  bindInteractionFeedback();
+  currentView='cardio'; document.body.classList.remove('home-mode'); const current=activeCardioProgram();
+  screen.innerHTML=`<section><div class="kicker">CONDITIONING SYSTEM</div><h1 class="home-title cardio-title">CARDIO</h1>
+    <div class="program-current-card cardio-program-card" style="--program-accent:${current.cardio[0]?.color||'#111'}">
+      <div class="program-card-kicker">CURRENT PROGRAM</div><div class="program-card-title">${current.label} — ${current.name}</div><div class="program-card-desc">${current.description}</div>
+      <div class="program-card-meta"><span>${current.cardio.length} OPTIONS</span><span>ACTIVE</span></div><button class="program-open" id="openCurrentCardio">OPEN PROGRAM →</button>
+    </div><div class="library-heading">YOUR PROGRAMS</div><div class="program-list">${cardioPrograms.map(p=>`
+      <button class="program-list-card ${p.id===state.activeCardioProgram?'active':''}" data-cardio-program="${p.id}"><div class="program-list-accent" style="background:${p.cardio[0]?.color||'#111'}"></div>
+      <div class="program-list-copy"><div class="program-list-label">${p.label}</div><strong>${p.name}</strong><small>${p.cardio.length} OPTIONS • ${p.status.toUpperCase()}</small></div><span class="program-list-arrow">›</span></button>`).join('')}</div>
+    <div class="library-note">New cardio programs can be added here later without changing this layout.</div></section>`;
+  document.getElementById('openCurrentCardio').onclick=()=>renderCardioProgram(current.id);
+  document.querySelectorAll('[data-cardio-program]').forEach(x=>x.onclick=()=>renderCardioProgram(x.dataset.cardioProgram)); bindInteractionFeedback();
 }
-function setupEdgeSwipe(){
+function renderCardioProgram(programId){
+  const p=cardioPrograms.find(x=>x.id===programId)||activeCardioProgram(); state.activeCardioProgram=p.id; save(); currentView='cardio-program'; document.body.classList.remove('home-mode');
+  screen.innerHTML=`<button class="back" id="backCardioPrograms">‹ All programs</button><section><div class="kicker">${p.label}</div><h1 class="home-title cardio-title">${p.name}</h1><p class="home-sub">${p.description}</p>
+    <div class="padel-switch"><div><strong>PADEL / HARD SESSION TODAY?</strong><div class="small-muted">If yes, skip Intervals and use Recovery or nothing.</div></div><div class="switch-row"><button class="mode-btn ${state.mode==='padel'?'active':''}" data-mode="padel">YES</button><button class="mode-btn ${state.mode==='no-padel'?'active':''}" data-mode="no-padel">NO</button></div></div>
+    <div class="cardio-list">${p.cardio.map(c=>`<article class="cardio-card ${state.mode==='padel'&&c.id==='C'?'dimmed':''}"><div class="cardio-head"><div class="cardio-dot" style="background:${c.color}">${c.id}</div><div><div class="day-name">${c.name}</div><div class="cardio-duration">${c.duration}</div></div></div><div class="cardio-intensity">${c.intensity}</div><div class="cardio-details">${c.details.map(x=>`<div>• ${x}</div>`).join('')}</div><div class="cardio-when"><strong>WHEN:</strong> ${c.when}</div><div class="cardio-actions"><button class="cardio-done ${isDone(scopedKey(p.id,'c-'+c.id))?'done-btn':''}" data-cardio="${c.id}">${isDone(scopedKey(p.id,'c-'+c.id))?'✓ DONE':'MARK DONE'}</button><a class="play" style="background:${c.color}" href="${c.url}" target="_blank" rel="noopener" aria-label="Open video">▶</a></div></article>`).join('')}</div></section>`;
+  document.getElementById('backCardioPrograms').onclick=renderCardio;
+  document.querySelectorAll('[data-mode]').forEach(x=>x.onclick=()=>{state.mode=x.dataset.mode;save();renderCardioProgram(p.id)});
+  document.querySelectorAll('[data-cardio]').forEach(x=>x.onclick=()=>{const k=scopedKey(p.id,'c-'+x.dataset.cardio);state.done[k]=!state.done[k];save();haptic(12);renderCardioProgram(p.id)}); bindInteractionFeedback();
+}function setupEdgeSwipe(){
   let startX=0,startY=0,tracking=false;
   const resetSwipe=()=>{screen.style.transition='transform 180ms ease';screen.style.transform='translateX(0)';setTimeout(()=>{screen.style.transition='';},190)};
   screen.addEventListener('touchstart',e=>{
@@ -168,7 +168,8 @@ function setupEdgeSwipe(){
       screen.style.transition='transform 180ms ease';screen.style.transform='translateX(28px)';
       setTimeout(()=>{
         screen.style.transition='';screen.style.transform='translateX(0)';
-        haptic(10); if(currentView==='day') renderWorkoutHome();
+        haptic(10); if(currentView==='day'||currentView==='program') renderWorkoutHome();
+        else if(currentView==='cardio-program') renderCardio();
         else if(currentView==='workout'||currentView==='cardio') home();
       },140);
     }else resetSwipe();
@@ -206,7 +207,7 @@ async function updateAndReload(){
 document.getElementById('reloadBtn').onclick=updateAndReload;
 function resetProgress(){
   if(confirm('Reset all workout and cardio checkmarks?')){
-    state={day:state.day,done:{},mode:state.mode,completedDays:{}};save();renderWorkoutHome();
+    state={day:1,done:{},mode:state.mode,completedDays:{},activeWorkoutProgram:'program-01',activeCardioProgram:'cardio-01',programStateVersion:2};save();renderWorkoutHome();
   }
 }
 setupEdgeSwipe();
