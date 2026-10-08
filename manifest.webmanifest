@@ -8,7 +8,7 @@
   "description": "Kikz strength, athleticism and padel training plan.",
   "icons": [
     {
-      "src": "icons/kikz-classic-dark.svg",
+      "src": "icons/kikz-app-icon.svg",
       "sizes": "512x512",
       "type": "image/svg+xml",
       "purpose": "any"
