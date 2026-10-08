@@ -206,7 +206,7 @@ function renderCardioProgram(programId){
       screen.style.transition='transform 140ms ease';screen.style.transform='translateX(36px)';
       setTimeout(()=>{screen.style.transition='';screen.style.transform='translateX(0)';haptic(10);
         if(currentView==='day'||currentView==='program')renderWorkoutHome();
-        else if(currentView==='cardio-program')renderCardio();
+        else if(currentView==='cardio-program')home();
         else if(currentView==='workout'||currentView==='cardio')home();
       },120);
     }else reset();
