@@ -20,10 +20,10 @@ function dayKeys(d){return [...d.warmup.map((_,i)=>`${d.id}-w-${i}`),...d.workou
 function dayProgress(d){const keys=dayKeys(d),done=keys.filter(k=>isDone(k)).length;return {done,total:keys.length,complete:done===keys.length}}
 function programProgress(p){const all=p.days.flatMap(d=>dayKeys(d)),done=all.filter(k=>isDone(k)).length;return {done,total:all.length,pct:all.length?Math.round(done/all.length*100):0}}
 function nextSession(p){return p.days.find(d=>!dayCompleted(d))||p.days[0]}
-function dayCompleted(d){return!!state.completedDays[scopedKey(activeProgram().id,d.id)]}
+function dayCompleted(d){const k=scopedKey(activeProgram().id,d.id);return !!state.completedDays[k]||dayProgress(d).complete}
 function color(d){return d.color}
 function isDone(key){return!!state.done[scopedKey(activeProgram().id,key)]}
-function toggle(key){const k=scopedKey(activeProgram().id,key);state.done[k]=!state.done[k];const d=dayById(state.day);if(d&&dayProgress(d).complete){state.completedDays[scopedKey(activeProgram().id,d.id)]=true;haptic([10,35,10])}else haptic(8);save();renderDay(state.day)}
+function toggle(key){const k=scopedKey(activeProgram().id,key);state.done[k]=!state.done[k];const d=dayById(state.day);if(d){const dayKey=scopedKey(activeProgram().id,d.id);if(dayProgress(d).complete){state.completedDays[dayKey]=true;haptic([10,35,10])}else{delete state.completedDays[dayKey];haptic(8)}}save();renderDay(state.day)}
 function cardioDone(key,programId=activeCardioProgram().id){return!!state.done[scopedKey(programId,key)]}
 function sectionTitle(n,label,d,id){return `<div class="section-title" id="${id||''}"><i style="background:${color(d)}">${n}</i>${label}</div>`}
 function home(view='workout'){
@@ -150,7 +150,7 @@ function renderDay(id){
   document.getElementById('start').onclick=()=>document.getElementById('workout')?.scrollIntoView({behavior:'smooth',block:'start'});
   document.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump)?.scrollIntoView({behavior:'smooth',block:'start'}));
   document.getElementById('completeDay').onclick=()=>{
-    state.completedDays=state.completedDays||{};state.completedDays[scopedKey(activeProgram().id,d.id)]=true;save();haptic([10,35,10]);renderDay(d.id);
+    state.completedDays=state.completedDays||{};const dayKey=scopedKey(activeProgram().id,d.id);dayKeys(d).forEach(k=>{state.done[scopedKey(activeProgram().id,k)]=true});state.completedDays[dayKey]=true;save();haptic([10,35,10]);renderDay(d.id);
   };
   document.getElementById('nextDay')?.addEventListener('click',()=>{state.day=Math.min(programDays().length,d.id+1);save();haptic(12);renderDay(state.day)});
   bindToggles();
@@ -219,22 +219,8 @@ homeButton.type='button';
 homeButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();home();});
 
 async function updateAndReload(){
-  try{
-    if('serviceWorker' in navigator){
-      const reg=await navigator.serviceWorker.getRegistration();
-      if(reg){
-        try{await reg.update();}catch(e){}
-        if(reg.waiting){
-          reg.waiting.postMessage({type:'SKIP_WAITING'});
-          await new Promise(r=>setTimeout(r,250));
-        }
-      }
-      if(window.caches){
-        const keys=await caches.keys();
-        await Promise.all(keys.map(k=>caches.delete(k)));
-      }
-    }
-  }catch(e){}
+  const button=document.getElementById('reloadBtn');if(button){button.disabled=true;button.setAttribute('aria-busy','true');}
+  try{if('serviceWorker' in navigator){const reg=await navigator.serviceWorker.getRegistration();if(reg){await reg.update();if(reg.waiting){reg.waiting.postMessage({type:'SKIP_WAITING'});return;}}}}catch(e){}
   window.location.reload();
 }
 document.getElementById('reloadBtn').onclick=updateAndReload;
