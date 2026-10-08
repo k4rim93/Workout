@@ -30,3 +30,7 @@
 .cardio-title{margin-top:4px}
 
 .bottom-nav button{min-height:44px;font-size:12px;letter-spacing:.04em}
+
+.poster-wrap{position:relative}
+.poster-link{position:absolute;display:block;z-index:8;border-radius:12px;background:transparent;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.poster-link:active{background:rgba(0,0,0,.06)}
