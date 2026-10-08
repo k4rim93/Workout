@@ -158,7 +158,7 @@ function renderDay(id){
 }
 function renderCardio(){
   currentView='cardio'; document.body.classList.remove('home-mode'); const current=activeCardioProgram();
-  screen.innerHTML=`<section><div class="kicker">CONDITIONING SYSTEM</div><h1 class="home-title cardio-title">CARDIO</h1>
+  screen.innerHTML=`<button class="back" id="backCardioHome">‹ HOME</button><section><div class="kicker">CONDITIONING SYSTEM</div><h1 class="home-title cardio-title">CARDIO</h1>
     <div class="program-current-card cardio-program-card" style="--program-accent:${current.cardio[0]?.color||'#111'}">
       <div class="program-card-kicker">CURRENT PROGRAM</div><div class="program-card-title">${current.label} — ${current.name}</div><div class="program-card-desc">${current.description}</div>
       <div class="program-card-meta"><span>${current.cardio.length} OPTIONS</span><span>ACTIVE</span></div>
@@ -168,6 +168,7 @@ function renderCardio(){
       <button class="program-list-card ${p.id===state.activeCardioProgram?'active':''}" data-cardio-program="${p.id}"><div class="program-list-accent" style="background:${p.cardio[0]?.color||'#111'}"></div>
       <div class="program-list-copy"><div class="program-list-label">${p.label}</div><strong>${p.name}</strong><small>${p.cardio.length} OPTIONS • ${p.status.toUpperCase()}</small></div><span class="program-list-arrow">›</span></button>`).join('')}</div>
     <div class="library-note">New cardio programs can be added here later without changing this layout.</div></section>`;
+  document.getElementById('backCardioHome').onclick=()=>home();
   document.getElementById('openCurrentCardio').onclick=()=>renderCardioProgram(current.id);
   document.querySelectorAll('[data-cardio-program]').forEach(x=>x.onclick=()=>renderCardioProgram(x.dataset.cardioProgram)); bindInteractionFeedback();
 }
