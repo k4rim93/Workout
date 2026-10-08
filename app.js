@@ -7,11 +7,11 @@ function isDone(key){return!!state.done[key]}
 function toggle(key){state.done[key]=!state.done[key];save();renderDay(state.day)}
 function sectionTitle(n,label,d){return `<div class="section-title"><i style="background:${color(d)}">${n}</i>${label}</div>`}
 function home(view='workout'){
+  document.body.classList.add('home-mode');
   screen.innerHTML=`<section class="home-screen home-full">
     <div class="home-hero home-full-hero">
       <img src="./kikz-home-clean.jpg" alt="KIKZ training" class="home-hero-img">
       <div class="home-overlay"></div>
-      <div class="home-full-brand">KIKZ</div>
       <div class="home-actions home-full-actions">
         <button class="home-choice workout-choice" id="homeWorkout" aria-label="Open Workout">
           <span class="choice-icon">▮▮</span>
@@ -30,6 +30,7 @@ function home(view='workout'){
   document.getElementById('homeCardio').onclick=()=>renderCardio();
 }
 function renderWorkoutHome(){
+  document.body.classList.remove('home-mode');
   screen.innerHTML=`<section>
     <div class="kicker">YOUR TRAINING PLAN</div>
     <h1 class="home-title">KIKZ</h1>
@@ -62,6 +63,7 @@ function posterLinks(dayId){
   return (raw[String(dayId)]||[]).map(([url,x,y,w,h])=>`<a class="poster-link" href="${url}" target="_blank" rel="noopener" aria-label="Open exercise video" style="left:${x/10.24}%;top:${y/15.36}%;width:${w/10.24}%;height:${h/15.36}%;"></a>`).join('');
 }
 function renderDay(id){
+  document.body.classList.remove('home-mode');
   const d=dayById(id);state.day=d.id;save();
   screen.innerHTML=`<button class="back" id="back">‹ All days</button><section class="hero"><div class="hero-media poster-wrap"><img src="${d.image}" alt="Day ${d.id} ${d.name}">${posterLinks(d.id)}</div><div class="hero-body"><div class="kicker">DAY ${d.id}</div><h1>${d.name}</h1><p class="focus">${d.focus}</p><button class="primary" id="start" style="background:${color(d)}">START / CONTINUE</button></div></section>
   ${sectionTitle(1,'WARM-UP',d)}<div class="list">${d.warmup.map((x,i)=>warmupItem(x,d,i)).join('')}</div>
@@ -73,6 +75,7 @@ function renderDay(id){
   bindToggles();
 }
 function renderCardio(){
+  document.body.classList.remove('home-mode');
   screen.innerHTML=`<section>
     <div class="kicker">TRAINING SYSTEM</div>
     <h1 class="home-title">KIKZ TRAINING</h1>
