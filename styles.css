@@ -81,3 +81,14 @@
   .home-full-actions .home-choice{padding:14px 11px}
   .home-full-actions .choice-copy strong{font-size:14px}
 }
+
+/* HOME MODE — force edge-to-edge app shell */
+html:has(body.home-mode),body.home-mode{background:#111}
+body.home-mode{overflow:hidden}
+.home-mode #app{max-width:none;width:100%;min-height:100svh;padding:0;margin:0;background:transparent;overflow:visible}
+.home-mode #screen{position:fixed;inset:0;width:100%;height:100svh;margin:0;padding:0;overflow:hidden}
+.home-mode .topbar{position:fixed;inset:0 0 auto 0;width:100%;height:calc(58px + var(--safe-top));padding:var(--safe-top) 16px 0;display:flex;align-items:flex-end;padding-bottom:10px;background:transparent;box-shadow:none;border-radius:0}
+.home-mode .topbar .icon-btn{background:rgba(255,255,255,.94)}
+.home-mode .topbar .brand{color:#111;text-shadow:0 1px 8px rgba(255,255,255,.35)}
+.home-full-hero{inset:0!important;width:100vw!important;height:100svh!important}
+.home-full-actions{bottom:calc(24px + var(--safe-bottom))!important}
