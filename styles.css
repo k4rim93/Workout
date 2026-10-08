@@ -101,3 +101,5 @@ body.home-mode{overflow:hidden}
 .home-full-actions .choice-icon{background:rgba(255,255,255,.16);color:#fff}
 .home-full-actions .choice-arrow{background:rgba(255,255,255,.16);color:#fff}
 .home-full-actions .choice-copy strong{color:#fff}
+
+.material-symbol{font-family:'Material Symbols Rounded';font-weight:500;font-style:normal;font-size:28px;line-height:1;letter-spacing:normal;text-transform:none;display:inline-block;white-space:nowrap;word-wrap:normal;direction:ltr;-webkit-font-feature-settings:'liga';-webkit-font-smoothing:antialiased;font-feature-settings:'liga';font-variation-settings:'FILL' 1,'wght' 500,'GRAD' 0,'opsz' 28}.home-full-actions .choice-icon.material-symbol{background:rgba(255,255,255,.16);color:#fff}
