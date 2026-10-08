@@ -7,10 +7,32 @@ function isDone(key){return!!state.done[key]}
 function toggle(key){state.done[key]=!state.done[key];save();renderDay(state.day)}
 function sectionTitle(n,label,d){return `<div class="section-title"><i style="background:${color(d)}">${n}</i>${label}</div>`}
 function home(view='workout'){
-  if(view==='cardio'){renderCardio();return;}
+  screen.innerHTML=`<section class="home-screen">
+    <div class="home-kicker">YOUR TRAINING</div>
+    <div class="home-brand">KIKZ</div>
+    <div class="home-hero">
+      <img src="./kikz-home.gif" alt="KIKZ training" class="home-hero-img">
+    </div>
+    <div class="home-actions">
+      <button class="home-choice workout-choice" id="homeWorkout">
+        <span class="choice-icon">▮▮</span>
+        <span class="choice-copy"><strong>WORKOUT</strong><small>4 TRAINING DAYS</small></span>
+        <span class="choice-arrow">›</span>
+      </button>
+      <button class="home-choice cardio-choice" id="homeCardio">
+        <span class="choice-icon">➜</span>
+        <span class="choice-copy"><strong>CARDIO</strong><small>4 CONDITIONING OPTIONS</small></span>
+        <span class="choice-arrow">›</span>
+      </button>
+    </div>
+  </section>`;
+  document.getElementById('homeWorkout').onclick=()=>renderWorkoutHome();
+  document.getElementById('homeCardio').onclick=()=>renderCardio();
+}
+function renderWorkoutHome(){
   screen.innerHTML=`<section>
     <div class="kicker">YOUR TRAINING PLAN</div>
-    <h1 class="home-title">KIKZ TRAINING</h1>
+    <h1 class="home-title">KIKZ</h1>
     <div class="main-tabs">
       <button class="main-tab active" id="workoutTab">WORKOUT</button>
       <button class="main-tab" id="cardioTab">CARDIO</button>
@@ -28,10 +50,9 @@ function home(view='workout'){
   </section>`;
   document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{state.day=Number(b.dataset.open);save();renderDay(state.day)});
   document.getElementById('cardioTab').onclick=()=>renderCardio();
-  document.getElementById('workoutTab').onclick=()=>home('workout');
-  setNav('workout');
+  document.getElementById('workoutTab').onclick=()=>renderWorkoutHome();
+  document.getElementById('resetHome').onclick=resetProgress;
 }
-
 function warmupItem(item,d,i){const[name,meta]=item,key=`${d.id}-w-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta"><span>${meta}</span></div></div></div>`}
 function workoutItem(item,d,i){const[name,sets,rir,rest,url]=item,key=`${d.id}-x-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta">${sets?`<span>${sets}</span>`:''}${rir?`<span>${rir}</span>`:''}${rest?`<span>Rest ${rest}</span>`:''}</div></div><a class="play" style="background:${color(d)}" href="${url}" target="_blank" rel="noopener" aria-label="Open video">▶</a></div>`}
 function mobilityItem(item,d,i){const[name,meta,url]=item,key=`${d.id}-m-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta"><span>${meta}</span></div></div><a class="play" style="background:${color(d)}" href="${url}" target="_blank" rel="noopener" aria-label="Open video">▶</a></div>`}
@@ -49,7 +70,7 @@ function renderDay(id){
   ${sectionTitle(3,'MOBILITY',d)}<div class="list">${d.mobility.map((x,i)=>mobilityItem(x,d,i)).join('')}</div>`;
   document.getElementById('back').onclick=home;
   document.getElementById('start').onclick=()=>document.querySelector('.section-title')?.scrollIntoView({behavior:'smooth'});
-  bindToggles();setNav(d.id);
+  bindToggles();
 }
 function renderCardio(){
   screen.innerHTML=`<section>
@@ -76,7 +97,7 @@ function renderCardio(){
   document.getElementById('cardioTab').onclick=()=>renderCardio();
   document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderCardio()});
   document.querySelectorAll('[data-cardio]').forEach(b=>b.onclick=()=>{const k='c-'+b.dataset.cardio;state.done[k]=!state.done[k];save();renderCardio()});
-  setNav('cardio');
+  
 }
 function setNav(active){
   document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.toggle('active',
@@ -85,9 +106,8 @@ function setNav(active){
 }
 const homeButton=document.getElementById('homeBtn');
 homeButton.type='button';
-homeButton.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();home('workout');setNav('workout');},{capture:true});
-homeButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();home('workout');setNav('workout');},{capture:true});
-document.addEventListener('click',e=>{if(e.target.id==='resetHome')resetProgress();});
+homeButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();home();});
+
 async function updateAndReload(){
   try{
     if('serviceWorker' in navigator){
