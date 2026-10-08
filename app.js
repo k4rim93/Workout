@@ -100,6 +100,8 @@ async function updateAndReload(){
   window.location.reload();
 }
 document.getElementById('reloadBtn').onclick=updateAndReload;
+document.getElementById('workoutNav').onclick=()=>home('workout');
+document.getElementById('cardioNav').onclick=()=>renderCardio();
 function resetProgress(){
   if(confirm('Reset all workout and cardio checkmarks?')){
     state={day:state.day,done:{},mode:state.mode};save();renderDay(state.day);
