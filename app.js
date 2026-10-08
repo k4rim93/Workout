@@ -6,7 +6,7 @@ function color(d){return d.color}
 function isDone(key){return!!state.done[key]}
 function toggle(key){state.done[key]=!state.done[key];save();renderDay(state.day)}
 function sectionTitle(n,label,d){return `<div class="section-title"><i style="background:${color(d)}">${n}</i>${label}</div>`}
-days.forEach(d=>{d.time=d.id===1?'75 – 90 MIN':d.id===2?'82 – 90 MIN':d.id===3?'78 – 88 MIN':'80 – 90 MIN'});function home(){
+function home(){
   screen.innerHTML=`<section>
     <div class="kicker">YOUR TRAINING PLAN</div>
     <h1 class="home-title">KIKZ TRAINING</h1>
@@ -34,7 +34,7 @@ function mobilityItem(item,d,i){const[name,meta,url]=item,key=`${d.id}-m-${i}`;r
 function bindToggles(){document.querySelectorAll('[data-toggle]').forEach(el=>el.addEventListener('click',e=>{if(e.target.closest('a')||e.target.closest('button')){if(e.target.closest('button')){toggle(el.dataset.toggle)}return}toggle(el.dataset.toggle)}))}
 function renderDay(id){
   const d=dayById(id);state.day=d.id;save();
-  screen.innerHTML=`<button class="back" id="back">‹ All days</button><section class="hero"><div class="hero-media"><img src="${d.image}" alt="Day ${d.id} ${d.name}"><div class="hero-meta"><div class="hero-time">${d.time}</div><div class="hero-advanced" style="background:${color(d)}">ADVANCED</div></div></div><div class="hero-body"><div class="kicker">DAY ${d.id}</div><h1>${d.name}</h1><p class="focus">${d.focus}</p><button class="primary" id="start" style="background:${color(d)}">START / CONTINUE</button></div></section>
+  screen.innerHTML=`<button class="back" id="back">‹ All days</button><section class="hero"><div class="hero-media"><img src="${d.image}" alt="Day ${d.id} ${d.name}"></div><div class="hero-body"><div class="kicker">DAY ${d.id}</div><h1>${d.name}</h1><p class="focus">${d.focus}</p><button class="primary" id="start" style="background:${color(d)}">START / CONTINUE</button></div></section>
   ${sectionTitle(1,'WARM-UP',d)}<div class="list">${d.warmup.map((x,i)=>warmupItem(x,d,i)).join('')}</div>
   ${sectionTitle(2,'WORKOUT',d)}<div class="list">${d.workout.map((x,i)=>workoutItem(x,d,i)).join('')}</div>
   <div class="progression"><strong>Progression:</strong> Hit the top of the rep range on all sets with good form → increase load next session.</div>
