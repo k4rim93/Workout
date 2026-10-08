@@ -92,3 +92,5 @@ body.home-mode{overflow:hidden}
 .home-mode .topbar .brand{color:#111;text-shadow:0 1px 8px rgba(255,255,255,.35)}
 .home-full-hero{inset:0!important;width:100vw!important;height:100svh!important}
 .home-full-actions{bottom:calc(24px + var(--safe-bottom))!important}
+
+.home-full-actions .choice-icon svg{width:25px;height:25px;display:block}.home-full-actions .workout-choice .choice-icon svg{width:27px;height:27px}.home-full-actions .cardio-choice .choice-icon svg{width:27px;height:27px}
