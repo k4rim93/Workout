@@ -83,7 +83,10 @@ function setNav(active){
     (active==='cardio'&&b.id==='cardioNav') || (active!=='cardio'&&b.id==='workoutNav')
   ));
 }
-document.getElementById('homeBtn').onclick=()=>home('workout');
+const homeButton=document.getElementById('homeBtn');
+homeButton.type='button';
+homeButton.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();home('workout');setNav('workout');},{capture:true});
+homeButton.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();home('workout');setNav('workout');},{capture:true});
 document.addEventListener('click',e=>{if(e.target.id==='resetHome')resetProgress();});
 async function updateAndReload(){
   try{
