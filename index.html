@@ -17,11 +17,12 @@
     <header class="topbar">
       <button class="icon-btn" id="homeBtn" aria-label="Home">⌂</button>
       <div class="brand">KIKZ <span>TRAINING</span></div>
-      <button class="icon-btn" id="resetBtn" aria-label="Reset progress">↺</button>
+      <button class="icon-btn" id="reloadBtn" aria-label="Update and reload app" title="Update app">↻</button>
     </header>
     <main id="screen"></main>
-    <nav class="bottom-nav" aria-label="Workout days">
-      <button data-day="1">DAY 1</button><button data-day="2">DAY 2</button><button data-day="3">DAY 3</button><button data-day="4">DAY 4</button>
+    <nav class="bottom-nav" aria-label="Training sections">
+      <button id="workoutNav" class="active">WORKOUT</button>
+      <button id="cardioNav">CARDIO</button>
     </nav>
   </div>
   <script src="data.js"></script><script src="app.js"></script>
