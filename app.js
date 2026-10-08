@@ -14,12 +14,10 @@ function home(view='workout'){
       <div class="home-overlay"></div>
       <div class="home-actions home-full-actions">
         <button class="home-choice workout-choice" id="homeWorkout" aria-label="Open Workout">
-          <span class="choice-icon ph-fill ph-barbell" aria-hidden="true"></span>
           <span class="choice-copy"><strong>WORKOUT</strong></span>
           <span class="choice-arrow">›</span>
         </button>
         <button class="home-choice cardio-choice" id="homeCardio" aria-label="Open Cardio">
-          <span class="choice-icon ph-fill ph-person-simple-run" aria-hidden="true"></span>
           <span class="choice-copy"><strong>CARDIO</strong></span>
           <span class="choice-arrow">›</span>
         </button>
