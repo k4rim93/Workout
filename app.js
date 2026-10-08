@@ -97,10 +97,10 @@ function renderDay(id){
   currentView='day';
   document.body.classList.remove('home-mode');
   const d=dayById(id);state.day=d.id;save();
-  const p=dayProgress(d),completed=dayCompleted(d),pct=Math.round((p.done/p.total)*100);
+  const p=dayProgress(d),completed=dayCompleted(d),pct=Math.round((p.done/p.total)*100),poster=activeProgram().id==='program-01'?posterLinks(d.id):'';
   screen.innerHTML=`<button class="back" id="back">‹ All days</button>
   <section class="hero">
-    <div class="hero-media poster-wrap"><img src="${d.image}" alt="Day ${d.id} ${d.name}">${posterLinks(d.id)}</div>
+    <div class="hero-media poster-wrap"><img src="${d.image}" alt="Day ${d.id} ${d.name}">${poster}</div>
     <div class="hero-body">
       <div class="kicker">DAY ${d.id}</div><h1>${d.name}</h1><p class="focus">${d.focus}</p>
       <div class="day-detail-progress"><div class="day-progress-row"><span>${completed?'✓ DAY COMPLETE':`${p.done}/${p.total} complete`}</span><span>${pct}%</span></div><div class="day-progress"><span style="width:${pct}%;background:${color(d)}"></span></div></div>
