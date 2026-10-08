@@ -3,10 +3,23 @@ let state=JSON.parse(localStorage.getItem(stateKey)||'{"day":1,"done":{},"mode":
 let currentView='home';
 function save(){localStorage.setItem(stateKey,JSON.stringify(state))}
 function dayById(id){return days.find(d=>d.id===Number(id))}
+function dayKeys(d){
+  return [
+    ...d.warmup.map((_,i)=>`${d.id}-w-${i}`),
+    ...d.workout.map((_,i)=>`${d.id}-x-${i}`),
+    ...d.mobility.map((_,i)=>`${d.id}-m-${i}`)
+  ];
+}
+function dayProgress(d){
+  const keys=dayKeys(d),done=keys.filter(k=>isDone(k)).length;
+  return {done,total:keys.length,complete:done===keys.length};
+}
+function dayCompleted(d){return!!(state.completedDays&&state.completedDays[d.id])}
+
 function color(d){return d.color}
 function isDone(key){return!!state.done[key]}
 function toggle(key){state.done[key]=!state.done[key];save();renderDay(state.day)}
-function sectionTitle(n,label,d){return `<div class="section-title"><i style="background:${color(d)}">${n}</i>${label}</div>`}
+function sectionTitle(n,label,d,id){return `<div class="section-title" id="${id||''}"><i style="background:${color(d)}">${n}</i>${label}</div>`}
 function home(view='workout'){
   currentView='home';
   document.body.classList.add('home-mode');
@@ -37,11 +50,19 @@ function renderWorkoutHome(){
     <h1 class="home-title">KIKZ</h1>
     <p class="home-sub">4 strength & athletic days.</p>
     <div class="day-grid">
-      ${days.map(d=>`<button class="day-card" data-open="${d.id}">
-        <div class="day-dot" style="background:${color(d)}">DAY ${d.id}</div>
-        <div><div class="day-name">${d.name}</div><div class="day-focus">${d.focus}</div></div>
-        <div class="chev">›</div>
-      </button>`).join('')}
+      ${days.map(d=>{
+        const p=dayProgress(d),done=dayCompleted(d);
+        return `<button class="day-card ${done?'day-completed':''}" data-open="${d.id}">
+          <div class="day-dot" style="background:${color(d)}">DAY ${d.id}</div>
+          <div class="day-card-copy">
+            <div class="day-name">${d.name}</div>
+            <div class="day-focus">${d.focus}</div>
+            <div class="day-progress-row"><span>${done?'✓ DAY COMPLETE':`${p.done}/${p.total} complete`}</span><span>${Math.round((p.done/p.total)*100)}%</span></div>
+            <div class="day-progress"><span style="width:${(p.done/p.total)*100}%;background:${color(d)}"></span></div>
+          </div>
+          <div class="chev">›</div>
+        </button>`;
+      }).join('')}
     </div>
     <button class="reset-link" id="resetHome">Reset progress</button>
     <div class="rule-card"><strong>Training rule:</strong> Padel counts as conditioning. If you played hard, skip Intervals. On busy days, do the Strength workout only.</div>
@@ -61,13 +82,32 @@ function renderDay(id){
   currentView='day';
   document.body.classList.remove('home-mode');
   const d=dayById(id);state.day=d.id;save();
-  screen.innerHTML=`<button class="back" id="back">‹ All days</button><section class="hero"><div class="hero-media poster-wrap"><img src="${d.image}" alt="Day ${d.id} ${d.name}">${posterLinks(d.id)}</div><div class="hero-body"><div class="kicker">DAY ${d.id}</div><h1>${d.name}</h1><p class="focus">${d.focus}</p><button class="primary" id="start" style="background:${color(d)}">START / CONTINUE</button></div></section>
-  ${sectionTitle(1,'WARM-UP',d)}<div class="list">${d.warmup.map((x,i)=>warmupItem(x,d,i)).join('')}</div>
-  ${sectionTitle(2,'WORKOUT',d)}<div class="list">${d.workout.map((x,i)=>workoutItem(x,d,i)).join('')}</div>
+  const p=dayProgress(d),completed=dayCompleted(d),pct=Math.round((p.done/p.total)*100);
+  screen.innerHTML=`<button class="back" id="back">‹ All days</button>
+  <section class="hero">
+    <div class="hero-media poster-wrap"><img src="${d.image}" alt="Day ${d.id} ${d.name}">${posterLinks(d.id)}</div>
+    <div class="hero-body">
+      <div class="kicker">DAY ${d.id}</div><h1>${d.name}</h1><p class="focus">${d.focus}</p>
+      <div class="day-detail-progress"><div class="day-progress-row"><span>${completed?'✓ DAY COMPLETE':`${p.done}/${p.total} complete`}</span><span>${pct}%</span></div><div class="day-progress"><span style="width:${pct}%;background:${color(d)}"></span></div></div>
+      <button class="primary" id="start" style="background:${color(d)}">${completed?'VIEW WORKOUT':'START / CONTINUE'}</button>
+    </div>
+  </section>
+  <nav class="section-nav" aria-label="Jump to section">
+    <button data-jump="warmup">WARM-UP</button><button data-jump="workout">WORKOUT</button><button data-jump="mobility">MOBILITY</button>
+  </nav>
+  ${sectionTitle(1,'WARM-UP',d,'warmup')}<div class="list">${d.warmup.map((x,i)=>warmupItem(x,d,i)).join('')}</div>
+  ${sectionTitle(2,'WORKOUT',d,'workout')}<div class="list">${d.workout.map((x,i)=>workoutItem(x,d,i)).join('')}</div>
   <div class="progression"><strong>Progression:</strong> Hit the top of the rep range on all sets with good form → increase load next session.</div>
-  ${sectionTitle(3,'MOBILITY',d)}<div class="list">${d.mobility.map((x,i)=>mobilityItem(x,d,i)).join('')}</div>`;
-  document.getElementById('back').onclick=home;
-  document.getElementById('start').onclick=()=>document.querySelector('.section-title')?.scrollIntoView({behavior:'smooth'});
+  ${sectionTitle(3,'MOBILITY',d,'mobility')}<div class="list">${d.mobility.map((x,i)=>mobilityItem(x,d,i)).join('')}
+  <div class="day-complete-wrap"><button class="day-complete ${completed?'completed':''}" id="completeDay">${completed?'✓ DAY COMPLETE': 'MARK DAY COMPLETE'}</button>${d.id<days.length?'<button class="next-day" id="nextDay">NEXT DAY →</button>':''}</div>
+  </div>`;
+  document.getElementById('back').onclick=renderWorkoutHome;
+  document.getElementById('start').onclick=()=>document.getElementById('workout')?.scrollIntoView({behavior:'smooth',block:'start'});
+  document.querySelectorAll('[data-jump]').forEach(b=>b.onclick=()=>document.getElementById(b.dataset.jump)?.scrollIntoView({behavior:'smooth',block:'start'}));
+  document.getElementById('completeDay').onclick=()=>{
+    state.completedDays=state.completedDays||{};state.completedDays[d.id]=true;save();renderDay(d.id);
+  };
+  document.getElementById('nextDay')?.addEventListener('click',()=>{state.day=Math.min(days.length,d.id+1);save();renderDay(state.day)});
   bindToggles();
 }
 function renderCardio(){
@@ -92,20 +132,30 @@ function renderCardio(){
 }
 function setupEdgeSwipe(){
   let startX=0,startY=0,tracking=false;
+  const resetSwipe=()=>{screen.style.transition='transform 180ms ease';screen.style.transform='translateX(0)';setTimeout(()=>{screen.style.transition='';},190)};
   screen.addEventListener('touchstart',e=>{
     if(!e.touches.length)return;
     const t=e.touches[0];
     tracking=t.clientX<=36;
-    if(tracking){startX=t.clientX;startY=t.clientY;}
+    if(tracking){startX=t.clientX;startY=t.clientY;screen.style.transition='';}
+  },{passive:true});
+  screen.addEventListener('touchmove',e=>{
+    if(!tracking||!e.touches.length)return;
+    const t=e.touches[0],dx=t.clientX-startX,dy=Math.abs(t.clientY-startY);
+    if(dx>0&&dy<Math.max(45,dx*.7))screen.style.transform=`translateX(${Math.min(dx*.18,14)}px)`;
   },{passive:true});
   screen.addEventListener('touchend',e=>{
     if(!tracking||!e.changedTouches.length)return;
     const t=e.changedTouches[0],dx=t.clientX-startX,dy=Math.abs(t.clientY-startY);
     tracking=false;
     if(dx>70&&dy<70){
-      if(currentView==='day') renderWorkoutHome();
-      else if(currentView==='workout'||currentView==='cardio') home();
-    }
+      screen.style.transition='transform 180ms ease';screen.style.transform='translateX(28px)';
+      setTimeout(()=>{
+        screen.style.transition='';screen.style.transform='translateX(0)';
+        if(currentView==='day') renderWorkoutHome();
+        else if(currentView==='workout'||currentView==='cardio') home();
+      },140);
+    }else resetSwipe();
   },{passive:true});
 }
 
@@ -140,7 +190,7 @@ async function updateAndReload(){
 document.getElementById('reloadBtn').onclick=updateAndReload;
 function resetProgress(){
   if(confirm('Reset all workout and cardio checkmarks?')){
-    state={day:state.day,done:{},mode:state.mode};save();renderDay(state.day);
+    state={day:state.day,done:{},mode:state.mode,completedDays:{}};save();renderWorkoutHome();
   }
 }
 setupEdgeSwipe();
