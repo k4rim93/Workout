@@ -23,6 +23,7 @@ function home(){
       <div><div class="day-name">CARDIO • 4 OPTIONS</div><div class="day-focus">Choose based on Padel, fatigue and how busy your day is.</div></div>
       <div class="chev">›</div>
     </button>
+    <button class="reset-link" id="resetHome">Reset progress</button>
     <div class="rule-card"><strong>Training rule:</strong> Padel counts as conditioning. If you played hard, skip Intervals. On busy days, do the Strength workout only.</div>
   </section>`;
   document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{state.day=Number(b.dataset.open);save();renderDay(state.day)});
@@ -65,8 +66,36 @@ function renderCardio(){
 }
 function setNav(active){document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.toggle('active',b.dataset.day===String(active)|| (active==='cardio'&&b.id==='cardioNav')))}
 document.getElementById('homeBtn').onclick=home;
-document.getElementById('resetBtn').onclick=()=>{if(confirm('Reset all workout and cardio checkmarks?')){state={day:state.day,done:{},mode:state.mode};save();renderDay(state.day)}};
+document.addEventListener('click',e=>{if(e.target.id==='resetHome')resetProgress();});
+async function updateAndReload(){
+  try{
+    if('serviceWorker' in navigator){
+      const reg=await navigator.serviceWorker.getRegistration();
+      if(reg){
+        try{await reg.update();}catch(e){}
+        if(reg.waiting){
+          reg.waiting.postMessage({type:'SKIP_WAITING'});
+          await new Promise(r=>setTimeout(r,250));
+        }
+      }
+      if(window.caches){
+        const keys=await caches.keys();
+        await Promise.all(keys.map(k=>caches.delete(k)));
+      }
+    }
+  }catch(e){}
+  window.location.reload();
+}
+document.getElementById('reloadBtn').onclick=updateAndReload;
+function resetProgress(){
+  if(confirm('Reset all workout and cardio checkmarks?')){
+    state={day:state.day,done:{},mode:state.mode};save();renderDay(state.day);
+  }
+}
 document.querySelectorAll('.bottom-nav button[data-day]').forEach(b=>b.onclick=()=>{state.day=Number(b.dataset.day);save();renderDay(state.day)});
 document.getElementById('cardioNav').onclick=renderCardio;
 home();
-if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js');
+if('serviceWorker'in navigator){
+  navigator.serviceWorker.register('sw.js').then(reg=>reg.update()).catch(()=>{});
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{window.location.reload();},{once:true});
+}
