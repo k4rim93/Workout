@@ -11,7 +11,7 @@ function home(view='workout'){
     <div class="home-kicker">YOUR TRAINING</div>
     <div class="home-brand">KIKZ</div>
     <div class="home-hero">
-      <img src="./kikz-home.gif" alt="KIKZ training" class="home-hero-img">
+      <img src="./kikz-home-clean.jpg" alt="KIKZ training" class="home-hero-img">
     </div>
     <div class="home-actions">
       <button class="home-choice workout-choice" id="homeWorkout">
@@ -97,7 +97,6 @@ function renderCardio(){
   document.getElementById('cardioTab').onclick=()=>renderCardio();
   document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderCardio()});
   document.querySelectorAll('[data-cardio]').forEach(b=>b.onclick=()=>{const k='c-'+b.dataset.cardio;state.done[k]=!state.done[k];save();renderCardio()});
-  
 }
 function setNav(active){
   document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.toggle('active',
