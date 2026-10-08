@@ -14,12 +14,12 @@ function home(view='workout'){
       <div class="home-overlay"></div>
       <div class="home-actions home-full-actions">
         <button class="home-choice workout-choice" id="homeWorkout" aria-label="Open Workout">
-          <span class="choice-icon">▮▮</span>
+          <span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path d="M9 18v12M14 14v20M18 19h12M30 14v20M35 18v12" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/><path d="M7 20h4M7 28h4M37 20h4M37 28h4" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round"/></svg></span>
           <span class="choice-copy"><strong>WORKOUT</strong></span>
           <span class="choice-arrow">›</span>
         </button>
         <button class="home-choice cardio-choice" id="homeCardio" aria-label="Open Cardio">
-          <span class="choice-icon">➜</span>
+          <span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="28" cy="8" r="4" fill="currentColor"/><path d="M25 14l-5 9 6 5 4 9M20 23l-8 7M26 18l8 5 6-5M23 31l-8 10M31 29l8 9" fill="none" stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
           <span class="choice-copy"><strong>CARDIO</strong></span>
           <span class="choice-arrow">›</span>
         </button>
@@ -34,11 +34,7 @@ function renderWorkoutHome(){
   screen.innerHTML=`<section>
     <div class="kicker">YOUR TRAINING PLAN</div>
     <h1 class="home-title">KIKZ</h1>
-    <div class="main-tabs">
-      <button class="main-tab active" id="workoutTab">WORKOUT</button>
-      <button class="main-tab" id="cardioTab">CARDIO</button>
-    </div>
-    <p class="home-sub">4 strength & athletic days. Choose cardio separately based on Padel and fatigue.</p>
+    <p class="home-sub">4 strength & athletic days.</p>
     <div class="day-grid">
       ${days.map(d=>`<button class="day-card" data-open="${d.id}">
         <div class="day-dot" style="background:${color(d)}">DAY ${d.id}</div>
@@ -50,8 +46,6 @@ function renderWorkoutHome(){
     <div class="rule-card"><strong>Training rule:</strong> Padel counts as conditioning. If you played hard, skip Intervals. On busy days, do the Strength workout only.</div>
   </section>`;
   document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{state.day=Number(b.dataset.open);save();renderDay(state.day)});
-  document.getElementById('cardioTab').onclick=()=>renderCardio();
-  document.getElementById('workoutTab').onclick=()=>renderWorkoutHome();
   document.getElementById('resetHome').onclick=resetProgress;
 }
 function warmupItem(item,d,i){const[name,meta]=item,key=`${d.id}-w-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta"><span>${meta}</span></div></div></div>`}
@@ -77,13 +71,7 @@ function renderDay(id){
 function renderCardio(){
   document.body.classList.remove('home-mode');
   screen.innerHTML=`<section>
-    <div class="kicker">TRAINING SYSTEM</div>
-    <h1 class="home-title">KIKZ TRAINING</h1>
-    <div class="main-tabs">
-      <button class="main-tab" id="workoutTab">WORKOUT</button>
-      <button class="main-tab active" id="cardioTab">CARDIO</button>
-    </div>
-    <div class="kicker cardio-kicker">CONDITIONING SYSTEM</div><h1 class="home-title cardio-title">CARDIO</h1>
+    <div class="kicker">CONDITIONING SYSTEM</div><h1 class="home-title cardio-title">CARDIO</h1>
     <p class="home-sub">4 options — pick the one that matches your Padel load and fatigue.</p>
     <div class="padel-switch">
       <div><strong>PADEL / HARD SESSION TODAY?</strong><div class="small-muted">If yes, skip Intervals and use Recovery or nothing.</div></div>
@@ -96,8 +84,6 @@ function renderCardio(){
       <div class="cardio-when"><strong>WHEN:</strong> ${c.when}</div>
       <div class="cardio-actions"><button class="cardio-done ${isDone('c-'+c.id)?'done-btn':''}" data-cardio="${c.id}">${isDone('c-'+c.id)?'✓ DONE':'MARK DONE'}</button><a class="play" style="background:${c.color}" href="${c.url}" target="_blank" rel="noopener" aria-label="Open video">▶</a></div>
     </article>`).join('')}</div>`;
-  document.getElementById('workoutTab').onclick=()=>home('workout');
-  document.getElementById('cardioTab').onclick=()=>renderCardio();
   document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderCardio()});
   document.querySelectorAll('[data-cardio]').forEach(b=>b.onclick=()=>{const k='c-'+b.dataset.cardio;state.done[k]=!state.done[k];save();renderCardio()});
 }
