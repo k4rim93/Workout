@@ -1,5 +1,6 @@
 const screen=document.getElementById('screen'),days=window.KIKZ_DAYS,cardio=window.KIKZ_CARDIO,stateKey='kikz-training-v2';
 let state=JSON.parse(localStorage.getItem(stateKey)||'{"day":1,"done":{},"mode":"no-padel"}');
+let currentView='home';
 function save(){localStorage.setItem(stateKey,JSON.stringify(state))}
 function dayById(id){return days.find(d=>d.id===Number(id))}
 function color(d){return d.color}
@@ -7,6 +8,7 @@ function isDone(key){return!!state.done[key]}
 function toggle(key){state.done[key]=!state.done[key];save();renderDay(state.day)}
 function sectionTitle(n,label,d){return `<div class="section-title"><i style="background:${color(d)}">${n}</i>${label}</div>`}
 function home(view='workout'){
+  currentView='home';
   document.body.classList.add('home-mode');
   screen.innerHTML=`<section class="home-screen home-full">
     <div class="home-hero home-full-hero">
@@ -28,6 +30,7 @@ function home(view='workout'){
   document.getElementById('homeCardio').onclick=()=>renderCardio();
 }
 function renderWorkoutHome(){
+  currentView='workout';
   document.body.classList.remove('home-mode');
   screen.innerHTML=`<section>
     <div class="kicker">YOUR TRAINING PLAN</div>
@@ -55,6 +58,7 @@ function posterLinks(dayId){
   return (raw[String(dayId)]||[]).map(([url,x,y,w,h])=>`<a class="poster-link" href="${url}" target="_blank" rel="noopener" aria-label="Open exercise video" style="left:${x/10.24}%;top:${y/15.36}%;width:${w/10.24}%;height:${h/15.36}%;"></a>`).join('');
 }
 function renderDay(id){
+  currentView='day';
   document.body.classList.remove('home-mode');
   const d=dayById(id);state.day=d.id;save();
   screen.innerHTML=`<button class="back" id="back">‹ All days</button><section class="hero"><div class="hero-media poster-wrap"><img src="${d.image}" alt="Day ${d.id} ${d.name}">${posterLinks(d.id)}</div><div class="hero-body"><div class="kicker">DAY ${d.id}</div><h1>${d.name}</h1><p class="focus">${d.focus}</p><button class="primary" id="start" style="background:${color(d)}">START / CONTINUE</button></div></section>
@@ -67,6 +71,7 @@ function renderDay(id){
   bindToggles();
 }
 function renderCardio(){
+  currentView='cardio';
   document.body.classList.remove('home-mode');
   screen.innerHTML=`<section>
     <div class="kicker">CONDITIONING SYSTEM</div><h1 class="home-title cardio-title">CARDIO</h1>
@@ -85,6 +90,25 @@ function renderCardio(){
   document.querySelectorAll('[data-mode]').forEach(b=>b.onclick=()=>{state.mode=b.dataset.mode;save();renderCardio()});
   document.querySelectorAll('[data-cardio]').forEach(b=>b.onclick=()=>{const k='c-'+b.dataset.cardio;state.done[k]=!state.done[k];save();renderCardio()});
 }
+function setupEdgeSwipe(){
+  let startX=0,startY=0,tracking=false;
+  screen.addEventListener('touchstart',e=>{
+    if(!e.touches.length)return;
+    const t=e.touches[0];
+    tracking=t.clientX<=36;
+    if(tracking){startX=t.clientX;startY=t.clientY;}
+  },{passive:true});
+  screen.addEventListener('touchend',e=>{
+    if(!tracking||!e.changedTouches.length)return;
+    const t=e.changedTouches[0],dx=t.clientX-startX,dy=Math.abs(t.clientY-startY);
+    tracking=false;
+    if(dx>70&&dy<70){
+      if(currentView==='day') renderWorkoutHome();
+      else if(currentView==='workout'||currentView==='cardio') home();
+    }
+  },{passive:true});
+}
+
 function setNav(active){
   document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.toggle('active',
     (active==='cardio'&&b.id==='cardioNav') || (active!=='cardio'&&b.id==='workoutNav')
@@ -119,6 +143,7 @@ function resetProgress(){
     state={day:state.day,done:{},mode:state.mode};save();renderDay(state.day);
   }
 }
+setupEdgeSwipe();
 home();
 if('serviceWorker'in navigator){
   navigator.serviceWorker.register('sw.js').then(reg=>reg.update()).catch(()=>{});
