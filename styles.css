@@ -117,3 +117,27 @@ body.home-mode{overflow:hidden}
   .home-full-actions .home-choice{padding-left:14px;padding-right:50px}
   .home-full-actions .choice-arrow{right:11px}
 }
+
+/* KIKZ POLISH V21 */
+.home-full-actions .home-choice{transition:transform .15s ease,box-shadow .15s ease;will-change:transform}
+.home-full-actions .home-choice:active{transform:scale(.975);box-shadow:0 6px 16px rgba(0,0,0,.16)}
+.day-card{transition:transform .15s ease,box-shadow .15s ease}
+.day-card:active{transform:scale(.985)}
+.day-card-copy{min-width:0}
+.day-progress-row{display:flex;justify-content:space-between;align-items:center;margin-top:9px;font-size:10px;font-weight:850;color:#777}
+.day-progress{height:5px;background:#eee;border-radius:999px;overflow:hidden;margin-top:5px}
+.day-progress span{display:block;height:100%;border-radius:999px;transition:width .25s ease}
+.day-completed .day-progress-row{color:#111}
+.section-nav{position:sticky;top:calc(58px + var(--safe-top));z-index:15;display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:14px 0 2px;padding:5px;background:rgba(245,245,245,.92);backdrop-filter:blur(14px);border:1px solid var(--line);border-radius:16px}
+.section-nav button{border:0;background:#fff;border-radius:11px;padding:9px 4px;font-size:9px;font-weight:900;letter-spacing:.04em;color:#666}
+.section-nav button:active{transform:scale(.97)}
+.day-detail-progress{margin-top:14px}
+.day-complete-wrap{display:grid;gap:8px;margin-top:18px}
+.day-complete,.next-day{width:100%;border:0;border-radius:15px;padding:14px;font-size:12px;font-weight:900;letter-spacing:.04em}
+.day-complete{background:#111;color:#fff}
+.day-complete.completed{background:#e9e9e9;color:#222}
+.next-day{background:#fff;border:1px solid var(--line);color:#111}
+@media(max-width:420px){
+  .section-nav{top:calc(58px + var(--safe-top));}
+  .section-nav button{font-size:8px;padding:9px 2px}
+}
