@@ -19,7 +19,7 @@ function home(view='workout'){
           <span class="choice-arrow">›</span>
         </button>
         <button class="home-choice cardio-choice" id="homeCardio" aria-label="Open Cardio">
-          <span class="choice-icon material-symbol" aria-hidden="true">fitness_center</span>
+          <span class="choice-icon material-symbol" aria-hidden="true">directions_run</span>
           <span class="choice-copy"><strong>CARDIO</strong></span>
           <span class="choice-arrow">›</span>
         </button>
