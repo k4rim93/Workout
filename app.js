@@ -46,41 +46,45 @@ function home(view='workout'){
   document.getElementById('homeCardio').onclick=()=>renderCardio();
 }
 function renderWorkoutHome(){
-  currentView='workout';
-  document.body.classList.remove('home-mode');
+  currentView='workout'; document.body.classList.remove('home-mode');
+  const current=activeProgram();
   screen.innerHTML=`<section>
-    <div class="kicker">YOUR TRAINING PLAN</div>
-    <h1 class="home-title">KIKZ</h1>
-    <p class="home-sub">4 strength & athletic days.</p>
-    <div class="day-grid">
-      ${days.map(d=>{
-        const p=dayProgress(d),done=dayCompleted(d);
-        return `<button class="day-card ${done?'day-completed':''}" data-open="${d.id}">
-          <div class="day-dot" style="background:${color(d)}">DAY ${d.id}</div>
-          <div class="day-card-copy">
-            <div class="day-name">${d.name}</div>
-            <div class="day-focus">${d.focus}</div>
-            <div class="day-progress-row"><span>${done?'✓ DAY COMPLETE':`${p.done}/${p.total} complete`}</span><span>${Math.round((p.done/p.total)*100)}%</span></div>
-            <div class="day-progress"><span style="width:${(p.done/p.total)*100}%;background:${color(d)}"></span></div>
-          </div>
-          <div class="chev">›</div>
-        </button>`;
-      }).join('')}
+    <div class="kicker">WORKOUT SYSTEM</div><h1 class="home-title">WORKOUT</h1>
+    <div class="program-current-card" style="--program-accent:${current.days[0]?.color||'#111'}">
+      <div class="program-card-kicker">CURRENT PROGRAM</div>
+      <div class="program-card-title">${current.label} — ${current.name}</div>
+      <div class="program-card-desc">${current.description}</div>
+      <div class="program-card-meta"><span>${current.days.length} DAYS / WEEK</span><span>ACTIVE</span></div>
+      <button class="program-open" id="openCurrentProgram">OPEN PROGRAM →</button>
     </div>
-    <div id="nextUpMount"></div>
-    <button class="reset-link" id="resetHome">Reset progress</button>
-    <div class="rule-card"><strong>Training rule:</strong> Padel counts as conditioning. If you played hard, skip Intervals. On busy days, do the Strength workout only.</div>
+    <div class="library-heading">YOUR PROGRAMS</div>
+    <div class="program-list">${programs.map(p=>`
+      <button class="program-list-card ${p.id===state.activeWorkoutProgram?'active':''}" data-program="${p.id}">
+        <div class="program-list-accent" style="background:${p.days[0]?.color||'#111'}"></div>
+        <div class="program-list-copy"><div class="program-list-label">${p.label}</div><strong>${p.name}</strong><small>${p.days.length} TRAINING DAYS • ${p.status.toUpperCase()}</small></div>
+        <span class="program-list-arrow">›</span>
+      </button>`).join('')}</div>
+    <div class="library-note">New programs can be added here later without changing this layout.</div>
   </section>`;
-  document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{state.day=Number(b.dataset.open);save();renderDay(state.day)});
-  document.getElementById('resetHome').onclick=resetProgress;
-  const mount=document.getElementById('nextUpMount');
-  const completed=(state.completedDays&&Object.keys(state.completedDays).filter(k=>state.completedDays[k]).map(Number))||[];
-  const next=days.find(d=>!completed.includes(d.id));
-  mount.innerHTML=next?'<div class="next-up-card"><div><span>NEXT UP</span><strong>DAY '+next.id+' — '+next.name+'</strong><small>'+next.focus+'</small></div><button data-open="'+next.id+'">START →</button></div>':'<div class="all-days-complete">✓ ALL 4 DAYS COMPLETE</div>';
-  mount.querySelector('[data-open]')?.addEventListener('click',()=>{state.day=Number(mount.querySelector('[data-open]').dataset.open);save();haptic(12);renderDay(state.day)});
+  document.getElementById('openCurrentProgram').onclick=()=>renderProgram(current.id);
+  document.querySelectorAll('[data-program]').forEach(b=>b.onclick=()=>renderProgram(b.dataset.program));
   bindInteractionFeedback();
 }
-function warmupItem(item,d,i){const[name,meta]=item,key=`${d.id}-w-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta"><span>${meta}</span></div></div></div>`}
+function renderProgram(programId){
+  const p=programs.find(x=>x.id===programId)||activeProgram(); state.activeWorkoutProgram=p.id; state.day=1; save(); currentView='program';
+  document.body.classList.remove('home-mode'); const days=p.days;
+  screen.innerHTML=`<button class="back" id="backPrograms">‹ All programs</button><section>
+    <div class="kicker">${p.label}</div><h1 class="home-title">${p.name}</h1><p class="home-sub">${p.description}</p>
+    <div class="day-grid">${days.map(d=>{const prog=dayProgress(d),done=dayCompleted(d);return `<button class="day-card ${done?'day-completed':''}" data-open="${d.id}"><div class="day-dot" style="background:${color(d)}">DAY ${d.id}</div><div class="day-card-copy"><div class="day-name">${d.name}</div><div class="day-focus">${d.focus}</div><div class="day-progress-row"><span>${done?'✓ DAY COMPLETE':`${prog.done}/${prog.total} complete`}</span><span>${Math.round((prog.done/prog.total)*100)}%</span></div><div class="day-progress"><span style="width:${(prog.done/prog.total)*100}%;background:${color(d)}"></span></div></div><div class="chev">›</div></button>`}).join('')}</div>
+    <div id="nextUpMount"></div><div class="program-history-note">Progress is saved separately for each program.</div>
+  </section>`;
+  document.getElementById('backPrograms').onclick=renderWorkoutHome;
+  document.querySelectorAll('[data-open]').forEach(x=>x.onclick=()=>{state.day=Number(x.dataset.open);save();renderDay(state.day)});
+  const mount=document.getElementById('nextUpMount'),next=days.find(d=>!dayCompleted(d));
+  mount.innerHTML=next?'<div class="next-up-card"><div><span>NEXT UP</span><strong>DAY '+next.id+' — '+next.name+'</strong><small>'+next.focus+'</small></div><button data-open="'+next.id+'">START →</button></div>':'<div class="all-days-complete">✓ ALL '+days.length+' DAYS COMPLETE</div>';
+  mount.querySelector('[data-open]')?.addEventListener('click',()=>{state.day=Number(mount.querySelector('[data-open]').dataset.open);save();haptic(12);renderDay(state.day)});
+  bindInteractionFeedback();
+}function warmupItem(item,d,i){const[name,meta]=item,key=`${d.id}-w-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta"><span>${meta}</span></div></div></div>`}
 function workoutItem(item,d,i){const[name,sets,rir,rest,url]=item,key=`${d.id}-x-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta">${sets?`<span>${sets}</span>`:''}${rir?`<span>${rir}</span>`:''}${rest?`<span>Rest ${rest}</span>`:''}</div></div><a class="play" style="background:${color(d)}" href="${url}" target="_blank" rel="noopener" aria-label="Open video">▶</a></div>`}
 function mobilityItem(item,d,i){const[name,meta,url]=item,key=`${d.id}-m-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta"><span>${meta}</span></div></div><a class="play" style="background:${color(d)}" href="${url}" target="_blank" rel="noopener" aria-label="Open video">▶</a></div>`}
 function bindToggles(){document.querySelectorAll('[data-toggle]').forEach(el=>el.addEventListener('click',e=>{if(e.target.closest('a')||e.target.closest('button')){if(e.target.closest('button')){toggle(el.dataset.toggle)}return}toggle(el.dataset.toggle)}))}
