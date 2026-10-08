@@ -14,12 +14,12 @@ function home(view='workout'){
       <div class="home-overlay"></div>
       <div class="home-actions home-full-actions">
         <button class="home-choice workout-choice" id="homeWorkout" aria-label="Open Workout">
-          <span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><path fill="currentColor" d="M5 18h5v-3h5v18h-5v-3H5v-4h5v-4H5v-4Zm33 0h-5v-3h-5v18h5v-3h5v-4h-5v-4h5v-4Zm-19-2h10v16H19V16Zm-3 4h3v8h-3v-8Zm13 0h3v8h-3v-8Z"/></svg></span>
+          <span class="choice-icon material-symbol" aria-hidden="true">fitness_center</span>
           <span class="choice-copy"><strong>WORKOUT</strong></span>
           <span class="choice-arrow">›</span>
         </button>
         <button class="home-choice cardio-choice" id="homeCardio" aria-label="Open Cardio">
-          <span class="choice-icon" aria-hidden="true"><svg viewBox="0 0 48 48"><circle cx="30" cy="7.5" r="4" fill="currentColor"/><path fill="currentColor" d="M24 14h7l4 6-3 2-4-4-2 7 6 5-2 3-8-5-4 7h-4l6-12 2-7-5 3-3 5-3-2 4-7 5-2Z"/><path fill="currentColor" d="m28 29 5 2 5 7h-4l-5-4-5-3 4-2Z"/></svg></span>
+          <span class="choice-icon material-symbol" aria-hidden="true">fitness_center</span>
           <span class="choice-copy"><strong>CARDIO</strong></span>
           <span class="choice-arrow">›</span>
         </button>
