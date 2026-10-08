@@ -29,6 +29,7 @@ function home(view='workout'){
   document.querySelectorAll('[data-open]').forEach(b=>b.onclick=()=>{state.day=Number(b.dataset.open);save();renderDay(state.day)});
   document.getElementById('cardioTab').onclick=()=>renderCardio();
   document.getElementById('workoutTab').onclick=()=>home('workout');
+  setNav('workout');
 }
 
 function warmupItem(item,d,i){const[name,meta]=item,key=`${d.id}-w-${i}`;return`<div class="item ${isDone(key)?'done':''}" data-toggle="${key}"><button class="check" aria-label="Mark complete" style="${isDone(key)?`background:${color(d)}`:''}">${isDone(key)?'✓':''}</button><div class="item-main"><div class="item-name">${name}</div><div class="item-meta"><span>${meta}</span></div></div></div>`}
@@ -82,7 +83,7 @@ function setNav(active){
     (active==='cardio'&&b.id==='cardioNav') || (active!=='cardio'&&b.id==='workoutNav')
   ));
 }
-document.getElementById('homeBtn').onclick=home;
+document.getElementById('homeBtn').onclick=()=>home('workout');
 document.addEventListener('click',e=>{if(e.target.id==='resetHome')resetProgress();});
 async function updateAndReload(){
   try{
@@ -107,6 +108,7 @@ document.getElementById('reloadBtn').onclick=updateAndReload;
 document.getElementById('workoutNav').onclick=()=>home('workout');
 document.getElementById('cardioNav').onclick=()=>renderCardio();
 document.addEventListener('click',e=>{
+  if(e.target.closest('#homeBtn')){e.preventDefault();e.stopPropagation();home('workout');return;}
   const b=e.target.closest('.bottom-nav button');
   if(!b)return;
   e.preventDefault();
