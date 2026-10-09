@@ -16,12 +16,14 @@ jobs:
           node --check app.js
           node --check data.js
           node --check sw.js
-      - name: Verify offline cache and app versions
+      - name: Verify offline cache, icon assets, and app versions
         shell: bash
         run: |
           set -euo pipefail
           grep -q "kikz-training-v2" app.js
-          grep -q "kikz-training-v41" sw.js
+          grep -q "kikz-training-v42" sw.js
+          grep -q 'manifest.webmanifest?v=42' index.html
+          grep -q 'apple-touch-icon.*icons/icon-192.png?v=42' index.html
           grep -q 'app.js?v=31' index.html
           grep -q 'app.js?v=31' sw.js
           grep -q "caches.match('./index.html'" sw.js
@@ -38,10 +40,18 @@ jobs:
             console.error('Missing offline assets:', missing.join(', '));
             process.exit(1);
           }
+          for (const [file, expected] of [['icons/icon-192.png',192],['icons/icon-512.png',512]]) {
+            const png = fs.readFileSync(file);
+            if (png.toString('hex',0,8) !== '89504e470d0a1a0a' || png.readUInt32BE(16)!==expected || png.readUInt32BE(20)!==expected) {
+              console.error('Invalid icon PNG or dimensions:', file);
+              process.exit(1);
+            }
+          }
           const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
-          if (!manifest.icons.some(i => i.sizes === '192x192') || !manifest.icons.some(i => i.sizes === '512x512')) {
-            console.error('Manifest must declare 192x192 and 512x512 icons.');
+          if (!manifest.icons.some(i => i.src === 'icons/icon-192.png' && i.sizes === '192x192') ||
+              !manifest.icons.some(i => i.src === 'icons/icon-512.png' && i.sizes === '512x512')) {
+            console.error('Manifest must declare the correct 192x192 and 512x512 icons.');
             process.exit(1);
           }
-          console.log('Offline assets and icon manifest checks passed.');
+          console.log('Offline assets and KIKZ icon dimensions verified.');
           NODE
