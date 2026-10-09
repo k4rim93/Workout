@@ -180,35 +180,51 @@ function renderCardioProgram(programId){
   document.querySelectorAll('[data-mode]').forEach(x=>x.onclick=()=>{state.mode=x.dataset.mode;save();renderCardioProgram(p.id)});
   document.querySelectorAll('[data-cardio]').forEach(x=>x.onclick=()=>{const k=scopedKey(p.id,'c-'+x.dataset.cardio);state.done[k]=!state.done[k];save();haptic(12);renderCardioProgram(p.id)}); bindInteractionFeedback();
 }function setupEdgeSwipe(){
-  let startX=0,startY=0,tracking=false;
-  const resetSwipe=()=>{screen.style.transition='transform 180ms ease';screen.style.transform='translateX(0)';setTimeout(()=>{screen.style.transition='';},190)};
-  screen.addEventListener('touchstart',e=>{
-    if(!e.touches.length)return;
+  let startX=0,startY=0,tracking=false,claimed=false;
+  const reset=()=>{
+    screen.style.transition='transform 220ms cubic-bezier(.22,.8,.25,1)';
+    screen.style.transform='translate3d(0,0,0)';
+    setTimeout(()=>{screen.style.transition='';},230);
+  };
+  // Capture the gesture from the document so it also works when the swipe
+  // starts over a card or near the lower-left corner.
+  document.addEventListener('touchstart',e=>{
+    if(!e.touches.length||currentView==='home')return;
     const t=e.touches[0];
-    tracking=t.clientX<=36;
+    tracking=t.clientX<=72;claimed=false;
     if(tracking){startX=t.clientX;startY=t.clientY;screen.style.transition='';}
   },{passive:true});
-  screen.addEventListener('touchmove',e=>{
+  document.addEventListener('touchmove',e=>{
     if(!tracking||!e.touches.length)return;
-    const t=e.touches[0],dx=t.clientX-startX,dy=Math.abs(t.clientY-startY);
-    if(dx>0&&dy<Math.max(45,dx*.7))screen.style.transform=`translateX(${Math.min(dx*.18,14)}px)`;
-  },{passive:true});
-  screen.addEventListener('touchend',e=>{
+    const t=e.touches[0],dx=t.clientX-startX,dy=t.clientY-startY;
+    if(dx>8&&Math.abs(dy)<Math.max(48,dx*.85)){
+      claimed=true;
+      if(e.cancelable)e.preventDefault();
+      screen.style.transform=`translate3d(${Math.min(dx*.28,48)}px,0,0)`;
+    }else if(Math.abs(dy)>Math.abs(dx)*1.15){
+      tracking=false;
+      reset();
+    }
+  },{passive:false});
+  document.addEventListener('touchend',e=>{
     if(!tracking||!e.changedTouches.length)return;
     const t=e.changedTouches[0],dx=t.clientX-startX,dy=Math.abs(t.clientY-startY);
     tracking=false;
-    if(dx>70&&dy<70){
-      screen.style.transition='transform 180ms ease';screen.style.transform='translateX(28px)';
+    if(claimed&&dx>48&&dy<115){
+      screen.style.transition='transform 170ms cubic-bezier(.2,.75,.25,1)';
+      screen.style.transform='translate3d(42px,0,0)';
       setTimeout(()=>{
-        screen.style.transition='';screen.style.transform='translateX(0)';
-        haptic(10); if(currentView==='day'||currentView==='program') renderWorkoutHome();
-        else if(currentView==='cardio-program') renderCardio();
-        else if(currentView==='workout'||currentView==='cardio') home();
-      },140);
-    }else resetSwipe();
+        screen.style.transition='';
+        screen.style.transform='translate3d(0,0,0)';
+        haptic(10);
+        if(currentView==='day'||currentView==='program')renderWorkoutHome();
+        else if(currentView==='cardio-program')home();
+        else if(currentView==='workout'||currentView==='cardio')home();
+      },145);
+    }else reset();
   },{passive:true});
+  document.addEventListener('touchcancel',()=>{tracking=false;reset();},{passive:true});
 }
-
 function setNav(active){
   document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.toggle('active',
     (active==='cardio'&&b.id==='cardioNav') || (active!=='cardio'&&b.id==='workoutNav')
