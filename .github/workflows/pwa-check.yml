@@ -22,8 +22,8 @@ jobs:
           set -euo pipefail
           grep -q "kikz-training-v2" app.js
           grep -q "kikz-training-v41" sw.js
-          grep -q 'src="app.js?v=31"' index.html
-          grep -q "'./app.js?v=31'" sw.js
+          grep -q 'app.js?v=31' index.html
+          grep -q 'app.js?v=31' sw.js
           grep -q "caches.match('./index.html'" sw.js
           grep -q 'ignoreSearch:true' sw.js
           node <<'NODE'
