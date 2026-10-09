@@ -10,8 +10,7 @@ jobs:
   static-pwa-checks:
     runs-on: ubuntu-latest
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
       - name: Check JavaScript syntax
         run: |
           node --check app.js
@@ -22,10 +21,10 @@ jobs:
         run: |
           set -euo pipefail
           grep -q "kikz-training-v2" app.js
-          grep -q "kikz-training-v40" sw.js
+          grep -q "kikz-training-v41" sw.js
           grep -q 'src="app.js?v=31"' index.html
           grep -q "'./app.js?v=31'" sw.js
-          grep -q "caches.match('./index.html')" sw.js
+          grep -q "caches.match('./index.html'" sw.js
           grep -q 'ignoreSearch:true' sw.js
           node <<'NODE'
           const fs = require('fs');
@@ -39,5 +38,10 @@ jobs:
             console.error('Missing offline assets:', missing.join(', '));
             process.exit(1);
           }
-          console.log('All required offline assets exist.');
+          const manifest = JSON.parse(fs.readFileSync('manifest.webmanifest', 'utf8'));
+          if (!manifest.icons.some(i => i.sizes === '192x192') || !manifest.icons.some(i => i.sizes === '512x512')) {
+            console.error('Manifest must declare 192x192 and 512x512 icons.');
+            process.exit(1);
+          }
+          console.log('Offline assets and icon manifest checks passed.');
           NODE
