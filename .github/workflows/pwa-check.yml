@@ -1,0 +1,43 @@
+name: Kikz PWA checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [final-offline-review-2026-10-09]
+
+jobs:
+  static-pwa-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+      - name: Check JavaScript syntax
+        run: |
+          node --check app.js
+          node --check data.js
+          node --check sw.js
+      - name: Verify offline cache and app versions
+        shell: bash
+        run: |
+          set -euo pipefail
+          grep -q "kikz-training-v2" app.js
+          grep -q "kikz-training-v40" sw.js
+          grep -q 'src="app.js?v=31"' index.html
+          grep -q "'./app.js?v=31'" sw.js
+          grep -q "caches.match('./index.html')" sw.js
+          grep -q 'ignoreSearch:true' sw.js
+          node <<'NODE'
+          const fs = require('fs');
+          const required = [
+            'styles.css', 'app.js', 'data.js', 'manifest.webmanifest',
+            'day1.png', 'day2.png', 'day3.png', 'day4.png',
+            'kikz-home-clean.jpg', 'icons/icon-192.png', 'icons/icon-512.png'
+          ];
+          const missing = required.filter(p => !fs.existsSync(p));
+          if (missing.length) {
+            console.error('Missing offline assets:', missing.join(', '));
+            process.exit(1);
+          }
+          console.log('All required offline assets exist.');
+          NODE
