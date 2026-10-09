@@ -4,7 +4,7 @@ const CORE_ASSETS=[
   './',
   './index.html',
   './styles.css?v=30',
-  './app.js?v=30',
+  './app.js?v=31',
   './data.js?v=30',
   './manifest.webmanifest',
   './day1.png',
