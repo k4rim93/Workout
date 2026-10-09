@@ -1,9 +1,9 @@
 /* Kikz Training offline-first service worker. */
-const CACHE='kikz-training-v42';
+const CACHE='kikz-training-v43';
 const CORE_ASSETS=[
   './','./index.html','./styles.css?v=30','./app.js?v=31','./data.js?v=30',
   './manifest.webmanifest?v=42','./day1.png','./day2.png','./day3.png','./day4.png',
-  './kikz-home-clean.jpg','./icons/icon-192.png','./icons/icon-512.png'
+  './kikz-home-clean.jpg?v=43','./icons/icon-192.png','./icons/icon-512.png'
 ];
 self.addEventListener('install',event=>event.waitUntil((async()=>{
   const cache=await caches.open(CACHE);
