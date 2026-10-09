@@ -1,4 +1,4 @@
-const CACHE='kikz-training-v37';
+const CACHE='kikz-training-v38';
 const ASSETS=[
   './',
   './index.html',
