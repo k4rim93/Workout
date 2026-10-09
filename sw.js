@@ -1,10 +1,11 @@
-const CACHE='kikz-training-v39';
-const ASSETS=[
+/* Kikz Training PWA offline cache. Keep core assets aligned with index.html. */
+const CACHE='kikz-training-v40';
+const CORE_ASSETS=[
   './',
   './index.html',
   './styles.css?v=30',
-  './app.js?v=30',
   './data.js?v=30',
+  './app.js?v=31',
   './manifest.webmanifest',
   './day1.png',
   './day2.png',
@@ -17,26 +18,26 @@ const ASSETS=[
 ];
 
 self.addEventListener('install',event=>{
-  event.waitUntil(
-    caches.open(CACHE)
-      .then(cache=>cache.addAll(ASSETS))
-      .then(()=>self.skipWaiting())
-  );
+  event.waitUntil((async()=>{
+    const cache=await caches.open(CACHE);
+    // Do not activate a build whose required offline files could not be cached.
+    await cache.addAll(CORE_ASSETS);
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate',event=>{
-  event.waitUntil(
-    caches.keys()
-      .then(keys=>Promise.all(
-        keys.filter(key=>key.startsWith('kikz-training-')&&key!==CACHE)
-          .map(key=>caches.delete(key))
-      ))
-      .then(()=>self.clients.claim())
-  );
+  event.waitUntil((async()=>{
+    const keys=await caches.keys();
+    await Promise.all(keys
+      .filter(key=>key.startsWith('kikz-training-')&&key!==CACHE)
+      .map(key=>caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
 
 self.addEventListener('message',event=>{
-  if(event.data&&event.data.type==='SKIP_WAITING')self.skipWaiting();
+  if(event.data&&event.data.type==='SKIP_WAITING')event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('fetch',event=>{
@@ -46,28 +47,36 @@ self.addEventListener('fetch',event=>{
   if(url.origin!==self.location.origin)return;
 
   if(request.mode==='navigate'){
-    event.respondWith(
-      fetch(request).then(response=>{
-        if(response.ok){
-          const copy=response.clone();
-          event.waitUntil(caches.open(CACHE).then(cache=>cache.put(request,copy)));
+    event.respondWith((async()=>{
+      try{
+        const response=await fetch(request);
+        if(response&&response.ok){
+          const cache=await caches.open(CACHE);
+          await cache.put('./index.html',response.clone());
         }
         return response;
-      }).catch(()=>caches.match('./index.html').then(page=>page||caches.match('./')))
-    );
+      }catch(error){
+        return await caches.match('./index.html')||await caches.match('./')||
+          new Response('Kikz Training is offline. Open the app online once to finish saving it for offline use.',{
+            status:503,headers:{'Content-Type':'text/plain; charset=utf-8'}
+          });
+      }
+    })());
     return;
   }
 
-  event.respondWith(
-    caches.match(request,{ignoreSearch:true}).then(cached=>{
-      if(cached)return cached;
-      return fetch(request).then(response=>{
-        if(response.ok){
-          const copy=response.clone();
-          event.waitUntil(caches.open(CACHE).then(cache=>cache.put(request,copy)));
-        }
-        return response;
-      });
-    })
-  );
+  event.respondWith((async()=>{
+    const cached=await caches.match(request,{ignoreSearch:true});
+    if(cached)return cached;
+    try{
+      const response=await fetch(request);
+      if(response&&response.ok){
+        const cache=await caches.open(CACHE);
+        await cache.put(request,response.clone());
+      }
+      return response;
+    }catch(error){
+      return new Response('',{status:504,statusText:'Offline'});
+    }
+  })());
 });
